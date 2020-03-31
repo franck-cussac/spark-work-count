@@ -86,6 +86,18 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }
 
   test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
+    HelloWorld.main(Array("", ""))
+
+
+    val actually = spark.read.parquet("C:\\hadoop\\project\\spark-work-count\\src\\main\\data\\region\\")
+
+    val df = spark.read.option("sep", ",").option("header", true).csv("C:\\hadoop\\project\\spark-work-count\\src\\main\\resources\\departements-france.csv")
+    val av = HelloWorld.avgDepByReg(df)
+    val expected = HelloWorld.renameColumn(av, "avg_dep", "avg_departement")
+
+
+    assertDataFrameEquals(actually, expected)
+
 
   }
 

@@ -22,14 +22,14 @@ object HelloWorld {
     val renamed = renameColumn(avg, "avg_dep", "avg_departement")
     renamed.show
 
-    renamed.write.mode("append").parquet("/data/region/")
+    renamed.write.mode("overwrite").parquet("C:\\hadoop\\project\\spark-work-count\\src\\main\\data\\region\\")
   }
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
     dataFrame.withColumn("code_departement", dataFrame.col("code_departement")
       .cast("Double"))
       .groupBy(col("code_region"))
-      .agg(avg("code_departement").as("avg_departement"),max("nom_region").as("nom_region"))
+      .agg(avg("code_departement").as("avg_departement"), first("nom_region").as("nom_region"))
   }
 
   def renameColumn(dataFrame: DataFrame, newName: String, oldName: String): DataFrame = {
