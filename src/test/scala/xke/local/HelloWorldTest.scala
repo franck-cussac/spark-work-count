@@ -34,7 +34,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     assertDataFrameEquals(actually, expected)
   }*/
-
+/*
   test("spark &  lazy") {
     Given("dataframe avec 3 colonnes : nom région, code région, numé département")
     val input = spark.sparkContext.parallelize(
@@ -53,26 +53,79 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
       ("Ile de france", 10 , 75)
     )
   }
-
+*/
   
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
+    Given("dataframe avec 3 colonnes : nom région, code région, numé département")
+    val input = spark.sparkContext.parallelize(
+      List(
+        ("Ile de france", 10 , 75),
+        ("Ile de france", 10 , 75),
+        ("Ile de france", 10 , 75),
+        ("Aquitaine", 20 , 50)
+      )
+    ).toDF("nom_region", "code_region", "code_departement")
 
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        (10 , 75, "Ile de france"),
+        ( 20 , 50, "Aquitaine")
+      )
+    ).toDF("code_region", "avg(code_departement)", "nom_region")
+
+    When("calcule average")
+    val actual = HelloWorld.avgDepByReg(input)
+
+    Then("return ok")
+    assertDataFrameEquals(actual, expected)
   }
 
   test("je veux renommer la colonne des moyennes des numéros département") {
 
-    Given("une dataframe avec au moins 3 colonnes : nom région, code région et numéro département")
-    val input = ???
-    val expected = ???
+    Given("dataframe avec 3 colonnes : nom région, code région, moyenne des départements")
+    val input = spark.sparkContext.parallelize(
+      List(
+        (10 , 75, "Ile de france"),
+        ( 20 , 50, "Aquitaine")
+      )
+    ).toDF("code_region", "avg(code_departement)", "nom_region")
 
-    When("")
-    val actual = HelloWorld.avgDepByReg(input)
 
-    Then("")
+    val expected = spark.sparkContext.parallelize(
+      List(
+        (10 , 75, "Ile de france"),
+        ( 20 , 50, "Aquitaine")
+      )
+    ).toDF("code_region", "avg_dep", "nom_region")
+
+    When("rename column")
+    val actual = HelloWorld.renameColumn(input)
+
+    Then("column renamed")
     assertDataFrameEquals(actual, expected)
   }
 
   test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
+    val input = "src/test/resources/departements-france.csv"
+
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        (84 , 1, "Auvergne-Rhone-Alpes"),
+        (32 , 2, "Hauts-de-France")
+      )
+    ).toDF("code_region", "avg_dep", "nom_region")
+
+    val df = spark.read.option("sep", ",").option("header", true).csv(input)
+
+    When("calcule average")
+    HelloWorld.renameColumn(HelloWorld.avgDepByReg(df)).write.parquet("test3.parquet")
+
+    val actually = spark.sqlContext.read.parquet("test3.parquet")
+
+    assertDataFrameEquals(actually, expected)
+
 
   }
 

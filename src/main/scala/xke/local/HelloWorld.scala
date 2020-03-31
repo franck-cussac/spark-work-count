@@ -34,8 +34,7 @@ object HelloWorld {
 
     println(s"1 :  ${df.collect.length}")*/
 
-    df.write.parquet("output.parquet")
-
+    //df.write.parquet("output.parquet")
     //lire fichier
     //groupby code region
     //colonne moyenne des numéros departement (traitement string)
@@ -43,6 +42,21 @@ object HelloWorld {
     //renommer colonne mooyenne des départements
     //eccrire fichier en parquet
 
+    renameColumn(avgDepByReg(df)).show()
 
+
+
+  }
+
+  def avgDepByReg(input: DataFrame): DataFrame = {
+    return input
+      .groupBy(col("code_region")).agg(
+      avg(col("code_departement")),
+      max("nom_region").as("nom_region")
+    )
+  }
+  def renameColumn(input: DataFrame): DataFrame = {
+    return input
+      .withColumnRenamed("avg(code_departement)", "avg_dep")
   }
 }
