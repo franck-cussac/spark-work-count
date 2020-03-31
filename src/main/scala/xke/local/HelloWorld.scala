@@ -23,13 +23,13 @@ object HelloWorld {
 
     val df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
     val df_avg = avgDepByReg(df)
-    val df_renamed = renameColumn(df_avg, "code_departement", "avg_dep")
+    val df_renamed = renameColumn(df_avg, "avg(code_departement)", "avg_dep")
     df_renamed.show
   }
 
   def avgDepByReg(df : DataFrame): DataFrame = {
     df.withColumn("code_departement", col("code_departement").cast("Integer"))
-      .groupBy(col("code_region"))
+      .groupBy(col("code_region"), col("nom_region"))
       .agg(
         avg("code_departement")
       )
