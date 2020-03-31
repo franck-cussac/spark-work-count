@@ -13,7 +13,11 @@ object HelloWorld {
     // garder que les lignes avec 10 résultat
     // afficher le nombre de lignes finale
 
-    val df = spark.read.option("delimiter", ",").option("header", false).csv("src/main/resources/departements-france.csv")
-    df.show
+    val df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
+
+    df.filter(df("code_region") % 2 === 0).groupBy(df("code_region")).count().show()
+
+
+    spark.sparkContext.setLogLevel("ERROR")
   }
 }
