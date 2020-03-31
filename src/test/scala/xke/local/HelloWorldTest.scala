@@ -102,7 +102,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     val df = spark.read.option("sep", ",").option("header", true).csv(input)
 
     When("calcule average")
-    HelloWorld.renameColumn(HelloWorld.avgDepByReg(df)).write.parquet("test3.parquet")
+    HelloWorld.renameColumn(HelloWorld.avgDepByReg(df)).write.mode("overwrite").parquet("test3.parquet")
 
     val actually = spark.sqlContext.read.parquet("test3.parquet")
 
