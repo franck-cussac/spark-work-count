@@ -25,6 +25,7 @@ object HelloWorld {
     val df_avg = avgDepByReg(df)
     val df_renamed = renameColumn(df_avg, "avg(code_departement)", "avg_dep")
     df_renamed.show
+    df_renamed.write.mode("overwrite").parquet("src/main/resources/output.parquet")
   }
 
   def avgDepByReg(df : DataFrame): DataFrame = {
