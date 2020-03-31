@@ -16,11 +16,22 @@ object HelloWorld {
     // 4) écrire le fichier en parquet
 
     var df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
-    df = df.withColumn("code_departement", col("code_departement"))
-        //.map(d => d.getString("code_departement"))
+    df = avgDepByReg(df)
+    df = renameColumn(df)
+
     df.show();
   }
 
-  def avgDepByReg: DataFrame = ???
-  def renameColumn: DataFrame = ???
+  def avgDepByReg(df: DataFrame): DataFrame = {
+    df
+      .withColumn("code_departement", col("code_departement"))
+      .groupBy("code_region")
+      .agg(
+        avg("code_departement")
+      )
+  }
+  def renameColumn(df: DataFrame): DataFrame = {
+    df
+      .withColumnRenamed("code_departement", "avg_dep")
+  }
 }
