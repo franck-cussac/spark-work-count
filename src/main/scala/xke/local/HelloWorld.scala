@@ -20,17 +20,15 @@ object HelloWorld {
       .filter(col("count") >= 5)*/
     //df.write.parquet("output.parquet")
     //avgDepByReg(df).show
-
-    val newDf = renameColumn(avgDepByReg(df))
-
+      .withColumn("code_departement", col("code_departement").cast("integer"))
+    renameColumn(avgDepByReg(df)).show
   }
 
   def avgDepByReg(df: DataFrame): DataFrame = {
     df.groupBy(col("code_region"))
       .avg("code_departement")
-      .as("avg_dep")
   }
   def renameColumn(df: DataFrame): DataFrame = {
-    df.withColumnRenamed("average", "avg_dep")
+    df.withColumnRenamed("avg(code_departement)", "avg_dep")
   }
 }
