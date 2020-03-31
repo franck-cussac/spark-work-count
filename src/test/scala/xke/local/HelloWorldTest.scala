@@ -35,24 +35,29 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }*/
 
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
-
-  }
-
-  test("je veux renommer la colonne des moyennes des numéros département") {
-
-    Given("une dataframe avec au moins 3 colonnes : nom région, code région et numéro département")
-    val input = ???
-    val expected = ???
+    Given("Column dans une réion")
+    val input = "code_departement,nom_departement,code_region,nom_region"
 
     When("")
-    val actual = HelloWorld.avgDepByReg(input)
 
     Then("")
-    assertDataFrameEquals(actual, expected)
   }
-
-  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
-
-  }
+//
+//  test("je veux renommer la colonne des moyennes des numéros département") {
+//
+//    Given("une dataframe avec au moins 3 colonnes : nom région, code région et numéro département")
+//    val input = "code_departement,nom_departement,code_region,nom_region"
+//    val expected = "code_regin,avg_dep,nom_region"
+//
+//    When("")
+//    val actual = HelloWorld.avgDepByReg(input)
+//
+//    Then("")
+//    assertDataFrameEquals(actual, expected)
+//  }
+//
+//  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
+//
+//  }
 
 }
