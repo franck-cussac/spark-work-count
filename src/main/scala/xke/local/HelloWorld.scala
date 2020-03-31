@@ -3,9 +3,15 @@ package xke.local
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
+
 object HelloWorld {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate()
+    val spark = SparkSession.builder()
+      .appName("test")
+      .master("local[*]")
+      .getOrCreate()
+    import spark.implicits._
+
 
     // code
     // src/main/resources/departements-france.csv
@@ -15,8 +21,22 @@ object HelloWorld {
     // 3) renommer la colonne moyenne des départements en avg_dep
     // 4) écrire le fichier en parquet
 
+    val df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
+      .where("code_region IS NOT LIKE %A% AND %B%")
+      .where("code_region IS NOT LIKE %A% AND %B%")
+
+    val df_avg = avgDepByReg(df)
+    val df_renamed = renameColumn(df_avg, "code_departement", "avg_dep")
+    df_renamed.show
+
   }
 
-  def avgDepByReg: DataFrame = ???
-  def renameColumn: DataFrame = ???
+  def avgDepByReg(df : DataFrame): DataFrame = {
+    df.groupBy(col("code_region"))
+      .avg("code_departement")
+      .as("avg_dep")
+  }
+  def renameColumn(df : DataFrame, oldName : String, newName : String): DataFrame = {
+    df.withColumnRenamed(oldName, newName)
+  }
 }
