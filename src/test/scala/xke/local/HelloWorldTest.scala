@@ -54,8 +54,26 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     )
   }
 
-  //test moyenne colonne
-  //test rebnommer la colonne des moyennes des numéros département
-  //verifier que je lis fichier, ajout colonne, la renomme, et sauvegarde efichier en parquet
+  
+  test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
+
+  }
+
+  test("je veux renommer la colonne des moyennes des numéros département") {
+
+    Given("une dataframe avec au moins 3 colonnes : nom région, code région et numéro département")
+    val input = ???
+    val expected = ???
+
+    When("")
+    val actual = HelloWorld.avgDepByReg(input)
+
+    Then("")
+    assertDataFrameEquals(actual, expected)
+  }
+
+  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
+
+  }
 
 }
