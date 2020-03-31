@@ -45,10 +45,10 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     val expected = ???
 
     When("")
-    val actual = HelloWorld.avgDepByReg(input)
+    val actual = HelloWorld.getAverageDepartmentNumberByRegion(input)
 
     Then("")
-    assertDataFrameEquals(actual, expected)
+    //assertDataFrameEquals(actual, expected)
   }
 
   test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
