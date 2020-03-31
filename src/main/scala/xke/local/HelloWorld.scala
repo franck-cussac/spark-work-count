@@ -33,26 +33,17 @@ object HelloWorld {
       // code_region, avg_dep, nom_region
     // 3) renommer la colonne moyenne des numéros de département en avg_dep
     // 4) écrire le fichier en parquet
-    val testDf = spark.read
-      .option("delimiter", ",")
-      .option("header", true)
-      .option("inferSchema", true)
-      .csv("src/main/resources/departements-france.csv")
-
-    testDf.show()
-
-    HelloWorld.avgDepByReg(testDf).show()
   }
 
   def avgDepByReg(df: DataFrame): DataFrame = {
     df
       .withColumn("code_departement", col("code_departement").cast("integer"))
       // .filter(row => row.getAs[String]("code_departement").matches("""\d+"""))
-      .groupBy("code_region")
-      .agg(
-        avg("code_departement").as("avg_dep")
-      )
+      .groupBy("code_region", "nom_region")
+      .avg("code_departement")
   }
 
-  def renameColumn(df: String): DataFrame = ???
+  def renameColumn(df: DataFrame, selectedColumn: String, renamedColumn: String): DataFrame = {
+    df.withColumnRenamed(selectedColumn, renamedColumn)
+  }
 }
