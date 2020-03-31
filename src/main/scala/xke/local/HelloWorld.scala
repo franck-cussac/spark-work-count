@@ -15,7 +15,8 @@ object HelloWorld {
 
     val df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
 
-    df.filter(df("code_region") % 2 === 0).groupBy(df("code_region")).count().show()
+    df.filter(df("code_region") % 2 === 0).groupBy(df("code_region")).count().show(df.count().toInt)
+    df.sort()
 
 
     spark.sparkContext.setLogLevel("ERROR")
