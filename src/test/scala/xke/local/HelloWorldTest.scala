@@ -32,7 +32,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }*/
 
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
-
+    Given("une dataframe avec au moins 3 colonnes ")
   }
 
   test("je veux renommer la colonne des moyennes des numéros département") {
