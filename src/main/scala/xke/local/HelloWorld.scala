@@ -15,6 +15,10 @@ object HelloWorld {
     // 3) renommer la colonne moyenne des départements en avg_dep
     // 4) écrire le fichier en parquet
 
+    var df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
+    df = df.withColumn("code_departement", col("code_departement"))
+        //.map(d => d.getString("code_departement"))
+    df.show();
   }
 
   def avgDepByReg: DataFrame = ???
