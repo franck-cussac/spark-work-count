@@ -1,6 +1,6 @@
 package xke.local
 
-import org.apache.spark.sql._
+import org.apache.spark.sql.{DataFrame, _}
 import org.apache.spark.sql.functions._
 
 object HelloWorld {
@@ -15,8 +15,14 @@ object HelloWorld {
     // 3) renommer la colonne moyenne des départements en avg_dep
     // 4) écrire le fichier en parquet
 
+
   }
 
-  def avgDepByReg: DataFrame = ???
-  def renameColumn: DataFrame = ???
+  def avgDepByReg(dataFrame: DataFrame): DataFrame = {
+
+    dataFrame.groupBy(col("code_region"), col("nom_region")).avg("code_departement")
+  }
+  def renameColumn(dataFrame: DataFrame, oldC : String, newC : String) = {
+    dataFrame.col(oldC).as(newC)
+  }
 }

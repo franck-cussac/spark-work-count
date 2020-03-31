@@ -48,13 +48,18 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
         ("IdF", 1, 30),
         ("Occitanie", 4, 31)
       )
+    ).toDF("nom_region", "code_region", "code_departement")
+
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+      ("Idf", 1, 20.0),
+      ("Occitanie", 4, 31.0)
     )
-    val expected = List(
-      ("Idf", 1, 20),
-      ("Occitanie", 4, 31)
-    )
+    ).toDF("nom_region", "code_region", "avg(code_departement)")
 
     When("On créait une colonne avec la moyenne des numéro département par code région et les colonnes code_region, avg_dep, nom_region")
+
     val actual = HelloWorld.avgDepByReg(input)
 
     Then("On devrait obtenir expected")
