@@ -35,13 +35,39 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }*/
 
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
-    Given("Column dans une réion")
-    val input = "code_departement,nom_departement,code_region,nom_region"
+    Given("list of departements")
+    val input = spark.sparkContext.parallelize(
+      List(("La Réunion", 974, 4), ("Guyane", 973, 3)))
+      .toDF("nom_region", "code_region", "code_departement")
 
-    When("")
+    val expected = spark.sparkContext.parallelize(
+      List(( 974.0, 4,  "La Réunion"), ( 973.0 , 3, "Guyane")))
+      .toDF("code_region", "avg(code_departement)", "nom_region")
 
-    Then("")
+    When("Call function avgDepByReg")
+    val actual = HelloWorld.avgDepByReg(input)
+
+    Then("Result Expected when is ok")
+    assertDataFrameEquals(actual, expected)
   }
+
+  test("je veux ajouter une colonne avec la moyenne des numéros département par région when is Ko") {
+    Given("list of departements")
+    val input = spark.sparkContext.parallelize(
+      List(("La Réunion", 974, 4), ("Guyane", 973, 3)))
+      .toDF("nom_region", "code_region", "code_departement")
+
+    val expected = spark.sparkContext.parallelize(
+      List(( 974.0, 4,  "La Réunion"), ( 978.0 , 3, "Guded")))
+      .toDF("code_region", "avg(code_departement)", "nom_region")
+
+    When("Call function avgDepByReg")
+    val actual = HelloWorld.avgDepByReg(input)
+
+    Then("Result Expected when is ko")
+    assert(actual !== expected)
+  }
+
 //
 //  test("je veux renommer la colonne des moyennes des numéros département") {
 //

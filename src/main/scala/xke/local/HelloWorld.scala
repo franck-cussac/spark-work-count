@@ -24,8 +24,11 @@ object HelloWorld {
     // 3
     val dfRename = renameColumn(dfAvg, "avg_departement", "avg_dep")
 
+
+
     // Display
     dfRename.show
+
   }
 
 
