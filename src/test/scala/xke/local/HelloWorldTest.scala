@@ -35,24 +35,78 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }*/
 
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
+    Given("dataframe avec 3 colonnes : nom région, code région, num dept")
+    val input = spark.sparkContext.parallelize(
+      List(
+        ("Grand Est", 44 , 52),
+        ("Grand Est", 44 , 52),
+        ("Grand Est", 44 , 52),
+        ("Guadeloupe", 1 , 50)
+      )
+    ).toDF("nom_region", "code_region", "code_departement")
+
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        (44 , 52, "Grand Est"),
+        ( 1 , 50, "Guadeloupe")
+      )
+    ).toDF("code_region", "avg(code_departement)", "nom_region")
+
+    When("calcul average")
+    val actual = HelloWorld.avgDepByReg(input)
+
+    Then("return ok")
+    assertDataFrameEquals(actual, expected)
 
   }
 
   test("je veux renommer la colonne des moyennes des numéros département") {
 
-    Given("une dataframe avec au moins 3 colonnes : nom région, code région et numéro département")
-    val input = ???
-    val expected = ???
+    Given("dataframe avec 3 colonnes : nom région, code région, moyenne des départements")
+    val input = spark.sparkContext.parallelize(
+      List(
+        (44 , 52, "Grand Est"),
+        ( 1 , 50, "Guadeloupe")
+      )
+    ).toDF("code_region", "avg(code_departement)", "nom_region")
 
-    When("")
-    val actual = HelloWorld.avgDepByReg(input)
 
-    Then("")
+    val expected = spark.sparkContext.parallelize(
+      List(
+        (44 , 52, "Grand Est"),
+        ( 1 , 50, "Guadeloupe")
+      )
+    ).toDF("code_region", "avg_dep", "nom_region")
+
+    When("rename column")
+    val actual = HelloWorld.renameColumn(input)
+
+    Then("column renamed")
     assertDataFrameEquals(actual, expected)
   }
 
-  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
 
+
+  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
+    val input = "src/test/resources/departements-france.csv"
+
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        (94 , 1, "Corse"),
+        (76 , 2, "Occitanie")
+      )
+    ).toDF("code_region", "avg_dep", "nom_region")
+
+    val df = spark.read.option("sep", ",").option("header", true).csv(input)
+
+    When("calcule average")
+    HelloWorld.renameColumn(HelloWorld.avgDepByReg(df)).write.parquet("test3.parquet")
+
+    val actually = spark.sqlContext.read.parquet("test3.parquet")
+
+    assertDataFrameEquals(actually, expected)
   }
 
 }
