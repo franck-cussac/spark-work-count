@@ -16,7 +16,8 @@ object HelloWorld {
     // 4) écrire le fichier en parquet
     val df = spark.read.option("sep",",").option("header",true  ).csv(input)
     val old = avgDepByReg(df)
-    renameColumn(old).show()
+    val _new = renameColumn(old)
+    _new.write.mode("append").parquet("src/main/resources/departements-france-out.parquet")
   }
 
   def avgDepByReg(df: DataFrame)  = {

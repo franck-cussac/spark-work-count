@@ -35,7 +35,23 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }*/
 
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
+    Given("J'ai un DF")
+    val input= List(
+      (1,"20","reg1"),
+      (1,"10","Reg1"),
+      (1,"36","Reg1"),
+      (4,"974","974LeMeilleurBled")
+    ).toDF("code_region","code_departement","nom_region")
 
+    val expected = List(
+      (1,"Reg1",22.0),
+      (4,"974LeMeilleurBled",974.0)
+    ).toDF("code_region","nom_region", "avg(code_departement)")
+    When("je lance limplementatione calcule de la moyenne")
+    val actual = HelloWorld.avgDepByReg(input)
+
+    Then("Je dois avoir le bon format de sortie")
+    assertDataFrameEquals(expected,actual);
   }
 
   test("je veux renommer la colonne des moyennes des numéros département") {
