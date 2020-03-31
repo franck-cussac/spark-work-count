@@ -21,6 +21,8 @@ object HelloWorld {
 
     val renamed = renameColumn(avg, "avg_dep", "avg_departement")
     renamed.show
+
+    renamed.write.mode("append").parquet("/data/region/")
   }
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
