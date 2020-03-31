@@ -33,4 +33,16 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     assertDataFrameEquals(actually, expected)
   }
+
+  test("je veux ajouter une colonne avec la moyenne des numeros departements par region") {
+
+  }
+
+  test("je veux renommer la colonne des moyennes des numeros departements") {
+
+  }
+
+  test("je veux verifier que je lis un fichier, ajoute une colonne, la renomme et sauvegarde mon fichier en parquet") {
+
+  }
 }
