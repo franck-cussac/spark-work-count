@@ -33,4 +33,10 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     assertDataFrameEquals(actually, expected)
   }
+
+  test("spark &  lazy") {
+    val df = spark.read.option("delimiter", ",").option("header", false).csv("src/main/resources/departements-france.csv")
+    val res = df.filter(df("code_departement") % 2 === 0)
+    res.show();
+  }
 }
