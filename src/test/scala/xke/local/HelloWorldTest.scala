@@ -35,24 +35,60 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }*/
 
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
+    Given("Un dataframe avec une région et deux département pour une moyenne")
+
+    val input = spark.sparkContext.parallelize(
+      List(
+        ("12", "Ile de france", 75),
+        ("10", "Ile de france", 75),
+        ("8", "Ile de france", 75),
+        ("5", "Auvergne",  70)
+      )
+    ).toDF("code_departement", "nom_region", "code_region")
+
+    When("I call the avg function")
+
+    val actual = HelloWorld.avgDepByReg(input)
+
+    Then("Dataframe are same")
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        (75, 10, "Ile de france"),
+        (70, 5, "Auvergne")
+      )
+    ).toDF("code_region", "avg(code_departement)", "nom_region")
+
+    assertDataFrameEquals(actual, expected)
 
   }
 
   test("je veux renommer la colonne des moyennes des numéros département") {
 
-    Given("une dataframe avec au moins 3 colonnes : nom région, code région et numéro département")
-    val input = ???
-    val expected = ???
+    Given("Un dataframe avec la colonne avg")
+    val input = spark.sparkContext.parallelize(
+      List(
+        (75, 10, "Ile de france"),
+        (70, 5, "Auvergne")
+      )
+    ).toDF("code_region", "avg(code_departement)", "nom_region")
 
-    When("")
-    val actual = HelloWorld.avgDepByReg(input)
+    When("I call the rename function")
+    val actual = HelloWorld.renameColumn(input)
 
     Then("")
+    val expected = spark.sparkContext.parallelize(
+      List(
+        (75, 10, "Ile de france"),
+        (70, 5, "Auvergne")
+      )
+    ).toDF("code_region", "avg_dep", "nom_region")
+
     assertDataFrameEquals(actual, expected)
   }
 
-  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
-
-  }
+//  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
+//
+//  }
 
 }
