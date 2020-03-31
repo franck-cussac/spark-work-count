@@ -8,7 +8,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   import spark.implicits._
 
   test("Je veux ajouter une colonne avec la moyenne des numéros de département par région") {
-    Given("Un dataframe avec 4 colonnes : code_departement, nom_departement, code_region, nom_region")
+    Given("")
     val input = spark.sparkContext.parallelize(List(
       ("01", "Ain", 84, "Auvergne-Rhône-Alpes"),
       ("02", "Aisne", 32, "Hauts-de-France"),
@@ -32,15 +32,13 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   test("Je veux renommer la colonne des moyennes des numéros de départements") {
     Given("")
     val input = spark.sparkContext.parallelize(List(
-      ("01", "Ain", 84, "Auvergne-Rhône-Alpes"),
-      ("02", "Aisne", 32, "Hauts-de-France"),
-      ("03", "Allier", 84, "Auvergne-Rhône-Alpes"),
-      ("04", "Alpes-de-Haute-Provence", 93, "Provence-Alpes-Côte d'Azur")
-    )).toDF("code_departement", "nom_departement", "code_region", "nom_region")
+      (32, "Hauts-de-France", 2.0),
+      (84, "Auvergne-Rhône-Alpes", 2.0),
+      (93, "Provence-Alpes-Côte d'Azur", 4.0)
+    )).toDF("code_region", "nom_region", "avg(code_departement)")
 
     When("")
-    val inputWithAvg = HelloWorld.avgDepByReg(input)
-    val actual = HelloWorld.renameColumn(inputWithAvg, "avg_dep")
+    val actual = HelloWorld.renameColumn(input, "avg_dep")
 
     Then("")
     val expected = spark.sparkContext.parallelize(List(
@@ -52,16 +50,29 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(actual, expected)
   }
 
-  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
-    //Given("une dataframe avec au moins 3 colonnes : nom région, code région et numéro département")
-    //val input = ???
-    //val expected = ???
+  test("Je veux vérifier que quand je lis un fichier, ajoute une colonne, la renomme et sauvegarde mon fichier en parquet") {
+    Given("")
+    val output = "src/test/resources/output/v2/parquet"
+    val inputDf = spark.sparkContext.parallelize(List(
+      ("01", "Ain", 84, "Auvergne-Rhône-Alpes"),
+      ("02", "Aisne", 32, "Hauts-de-France"),
+      ("03", "Allier", 84, "Auvergne-Rhône-Alpes"),
+      ("04", "Alpes-de-Haute-Provence", 93, "Provence-Alpes-Côte d'Azur")
+    )).toDF("code_departement", "nom_departement", "code_region", "nom_region")
 
-    //When("")
-    //val actual = HelloWorld.avgDepByReg(input)
+    When("")
+    val actualDf = HelloWorld.renameColumn(HelloWorld.avgDepByReg(inputDf), "avg_dep")
+    actualDf.write.format("parquet").mode("overwrite").save(output)
 
-    //Then("")
-    //assertDataFrameEquals(actual, expected)
+    Then("")
+    val outputDf = spark.sqlContext.read.parquet(output)
+    val expectedDf = spark.sparkContext.parallelize(List(
+      (32, "Hauts-de-France", 2.0),
+      (84, "Auvergne-Rhône-Alpes", 2.0),
+      (93, "Provence-Alpes-Côte d'Azur", 4.0)
+    )).toDF("code_region", "nom_region", "avg_dep")
+
+    assertDataFrameEquals(outputDf, expectedDf)
   }
 
 }
