@@ -8,6 +8,42 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   val spark = SharedSparkSession.sparkSession
   import spark.implicits._
 
+  test("Je veux ajouter une colonne avec la moyenne des numéros de département par région") {
+    Given("Un dataframe avec 3 colonnes : code_departement, code_region, nom_region")
+    val input = spark.sparkContext.parallelize(List(
+      (1, 2, "toto"),
+      (1, 3, "toto"),
+      (1, 4, "toto")
+    )).toDF("code_region", "code_departement","nom_region")
+
+    When("Je lance la fonction")
+    val actual = HelloWorld.avgDepByReg(input)
+
+    Then("les moyennes doivent être calculées")
+    val expected = spark.sparkContext.parallelize(List(
+      (1, "toto", 3.0)
+    )).toDF("code_region", "nom_region", "avg(code_departement)")
+
+    assertDataFrameEquals(actual, expected)
+  }
+
+  test("Je veux renommer la colonne des moyennes des numéros de départements") {
+    Given("Un dataframe avec 3 colonnes : code_departement, code_region, nom_region")
+    val input = spark.sparkContext.parallelize(List((1, 2, "toto"),
+      (1, 2, "toto")
+    )).toDF("code_region", "code_departement","nom_region")
+
+    When("Je lance le renommage")
+    val actual = HelloWorld.renameColumn(input, "code_departement", "departements")
+
+    Then("La colonne doit bien être renommée")
+    val expected = spark.sparkContext.parallelize(List(
+      (1, 2, "toto")
+    )).toDF("code_region", "departements","nom_region")
+
+    assertDataFrameEquals(actual, expected)
+  }
+
   test("main must create a file with word count result") {
     Given("input filepath and output filepath")
     val input = "src/test/resources/input.txt"
