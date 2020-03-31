@@ -1,5 +1,6 @@
 package xke.local
 
+import org.apache.spark.sql
 import org.scalatest.{FunSuite, GivenWhenThen}
 import spark.{DataFrameAssertions, SharedSparkSession}
 
@@ -7,7 +8,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   val spark = SharedSparkSession.sparkSession
   import spark.implicits._
 
-  test("main must create a file with word count result") {
+  /*test("main must create a file with word count result") {
     Given("input filepath and output filepath")
     val input = "src/test/resources/input.txt"
     val output = "src/test/resources/output/v1/parquet"
@@ -32,11 +33,29 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     val actually = spark.sqlContext.read.parquet(output)
 
     assertDataFrameEquals(actually, expected)
-  }
+  }*/
 
   test("spark &  lazy") {
-    val df = spark.read.option("delimiter", ",").option("header", false).csv("src/main/resources/departements-france.csv")
-    val res = df.filter(df("code_departement") % 2 === 0)
-    res.show();
+    Given("dataframe avec 3 colonnes : nom région, code région, numé département")
+    val input = spark.sparkContext.parallelize(
+      List(
+        ("Ile de france", 10 , 75),
+        ("Ile de france", 10 , 75),
+        ("Ile de france", 10 , 75),
+        ("Aquitaine", 10 , 75)
+      )
+    ).toDF("regions", "code_geion", "departement")
+
+    //val actual = HelloWorld.avgDepByReg(input: sql.DataFrame)
+
+    val expected = List(
+      ("Ile de france", 10 , 75),
+      ("Ile de france", 10 , 75)
+    )
   }
+
+  //test moyenne colonne
+  //test rebnommer la colonne des moyennes des numéros département
+  //verifier que je lis fichier, ajout colonne, la renomme, et sauvegarde efichier en parquet
+
 }

@@ -1,6 +1,7 @@
 package xke.local
 
-import org.apache.spark.sql.{SaveMode, SparkSession}
+import org.apache.spark.sql._
+import org.apache.spark.sql.functions._
 
 object HelloWorld {
   def main(args: Array[String]): Unit = {
@@ -22,10 +23,26 @@ object HelloWorld {
     //4 garder ligne avec 10 résultats
     //5 afficher nb ligne final
 
-    /*val df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
-    df.show()
-    val res = df.filter(df("code_departement") % 2 === 0)
-    res.show();
-    println(df.count())*/
+    val df = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")/*
+      .filter(col("code_region") % 2 === 0)
+      .groupBy(col("code_region")).count()
+      .filter(col("count") > 5)
+
+    df.show
+    println(df.count())
+    df.cache()
+
+    println(s"1 :  ${df.collect.length}")*/
+
+    df.write.parquet("output.parquet")
+
+    //lire fichier
+    //groupby code region
+    //colonne moyenne des numéros departement (traitement string)
+    //  code_region, avg_dep, nom_region
+    //renommer colonne mooyenne des départements
+    //eccrire fichier en parquet
+
+
   }
 }
