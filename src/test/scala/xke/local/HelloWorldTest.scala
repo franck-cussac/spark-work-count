@@ -33,4 +33,24 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     assertDataFrameEquals(actually, expected)
   }
+
+  test("Je veux ajouter une colonne avec la moyenne des numéros de département par région") {
+    // do something
+  }
+
+  test("Je veux renommer la colonne des moyennes des numéros de département") {
+    Given("Une dataframe avec 3 colonnes : nom région, code région et numéro de département")
+    val input = spark.sparkContext.parallelize(List(
+      ("Ile-de-France", 10, 75),
+      ("Ile-de-France", 10, 75),
+      ("Ile-de-France", 10, 75),
+      ("Aquitaine", 5, 33)
+    )).toDF("region", "code_region", "departement")
+
+    // do something
+  }
+
+  test("Je veux vérifier que je lis un fichier, ajoute une colonne, la renomme et sauvegarde mon fichier en parquet") {
+    // do something
+  }
 }
