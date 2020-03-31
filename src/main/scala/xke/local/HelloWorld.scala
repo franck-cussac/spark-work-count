@@ -19,7 +19,12 @@ object HelloWorld {
 
     val dfAvg = avgDepByReg(df = df)
     val dfRenameC = renameColumn(df = dfAvg)
-    val dfParquet = writePaquet(df = dfRenameC)
+
+   // df.write.mode("overwrite").parquet("src/main/resources/parquet/ex1/")
+    dfRenameC.write.mode("overwrite").parquet("src/main/parquet/ex1")
+
+
+    //val dfParquet = writePaquet(df = dfRenameC)
     dfRenameC.show
   }
 
@@ -32,7 +37,5 @@ object HelloWorld {
     df.withColumnRenamed("avg(code_departement)","avg_dep")
   }
 
-  def writePaquet(df: DataFrame): Unit = {
-    df.write.mode("append").parquet("src/main/resources/output/")
-  }
+
 }
