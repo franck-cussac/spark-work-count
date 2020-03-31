@@ -1,5 +1,6 @@
 package xke.local
 
+import org.assertj.core.api.Assertions
 import org.scalatest.{FunSuite, GivenWhenThen}
 import spark.{DataFrameAssertions, SharedSparkSession}
 
@@ -105,8 +106,17 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assert(actual !== expected)
   }
 
-  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
+  test("je veux vérifier que j'ai écris dans mon fichier") {
+    Given("une dataframe avec au moins 3 colonnes : nom région, code région et numéro département")
+    val input = spark.sparkContext.parallelize(
+      List(("La Réunion", 974, 4), ("Guyane", 973, 3)))
+      .toDF("nom_region", "code_region", "code_departement")
 
+    When("Call function rename")
+    HelloWorld.write(input,"C:\\Users\\christopher\\Downloads\\sort\\file.parquet")
+
+    Then("Read  File when is ok")
+    assert(spark.read.parquet("C:\\Users\\christopher\\Downloads\\sort\\file.parquet").columns.length === 3)
   }
 
 }

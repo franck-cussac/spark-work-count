@@ -24,13 +24,13 @@ object HelloWorld {
     // 3
     val dfRename = renameColumn(dfAvg, "avg_departement", "avg_dep")
 
-
+    // 4
+    write(dfRename, "C:\\Users\\christopher\\Downloads\\sort\\file.parquet")
 
     // Display
     dfRename.show
 
   }
-
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
     dataFrame.withColumn("code_departement", dataFrame.col("code_departement")
@@ -43,5 +43,11 @@ object HelloWorld {
   def renameColumn(dataFrame: DataFrame, theOldName: String, theNewName: String): DataFrame = {
     dataFrame.withColumnRenamed(theOldName, theNewName)
   }
+
+  def write(dataFrame: DataFrame, path: String) = {
+    dataFrame.write
+      .parquet(path)
+  }
+
 }
 
