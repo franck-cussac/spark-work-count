@@ -17,18 +17,22 @@ object HelloWorld {
     val df = spark.read.option("header", true).csv("src/main/resources/departements-france.csv")
       .withColumn("moyenne",col = col("code_region").cast("integer"))
 
-    val newDF = avgDepByReg(dataFrame = df)
-    val newDfName = renameColumn(dataFrame = newDF)
-    newDfName.show
+    val dfAvg = avgDepByReg(df = df)
+    val dfRenameC = renameColumn(df = dfAvg)
+    val dfParquet = writePaquet(df = dfRenameC)
+    dfRenameC.show
   }
 
-  def avgDepByReg(dataFrame: DataFrame): DataFrame = {
-    dataFrame.groupBy("code_region", "nom_region")
+  def avgDepByReg(df: DataFrame): DataFrame = {
+    df.groupBy("code_region", "nom_region")
       .agg(avg("code_departement"))
-   // dataFrame.groupBy(col("code_region")).avg("code_region").as("avg_dep")
   }
 
-  def renameColumn(dataFrame: DataFrame): DataFrame = {
-    dataFrame.withColumnRenamed("avg(code_departement)","avg_dep")
+  def renameColumn(df: DataFrame): DataFrame = {
+    df.withColumnRenamed("avg(code_departement)","avg_dep")
+  }
+
+  def writePaquet(df: DataFrame): Unit = {
+    df.write.mode("append").parquet("src/main/resources/output/")
   }
 }
