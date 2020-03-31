@@ -4,6 +4,10 @@ import org.apache.spark.sql
 import org.scalatest.{FunSuite, GivenWhenThen}
 import spark.{DataFrameAssertions, SharedSparkSession}
 
+import scala.reflect.io.Directory
+import java.io.File
+import java.util.Calendar
+
 class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertions {
   val spark = SharedSparkSession.sparkSession
   import spark.implicits._
@@ -34,34 +38,15 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     assertDataFrameEquals(actually, expected)
   }*/
-/*
-  test("spark &  lazy") {
-    Given("dataframe avec 3 colonnes : nom région, code région, numé département")
-    val input = spark.sparkContext.parallelize(
-      List(
-        ("Ile de france", 10 , 75),
-        ("Ile de france", 10 , 75),
-        ("Ile de france", 10 , 75),
-        ("Aquitaine", 10 , 75)
-      )
-    ).toDF("regions", "code_geion", "departement")
 
-    //val actual = HelloWorld.avgDepByReg(input: sql.DataFrame)
 
-    val expected = List(
-      ("Ile de france", 10 , 75),
-      ("Ile de france", 10 , 75)
-    )
-  }
-*/
-  
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
-    Given("dataframe avec 3 colonnes : nom région, code région, numé département")
+    Given("dataframe avec 3 colonnes : nom région, code région, numéro département")
     val input = spark.sparkContext.parallelize(
       List(
+        ("Ile de france", 10 , 73),
         ("Ile de france", 10 , 75),
-        ("Ile de france", 10 , 75),
-        ("Ile de france", 10 , 75),
+        ("Ile de france", 10 , 77),
         ("Aquitaine", 20 , 50)
       )
     ).toDF("nom_region", "code_region", "code_departement")
@@ -118,14 +103,14 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     ).toDF("code_region", "avg_dep", "nom_region")
 
     val df = spark.read.option("sep", ",").option("header", true).csv(input)
+    val output = "src/test/resources/output/test3.parquet"
 
     When("calcule average")
-    HelloWorld.renameColumn(HelloWorld.avgDepByReg(df)).write.parquet("test3.parquet")
+    HelloWorld.writeToParquet(HelloWorld.renameColumn(HelloWorld.avgDepByReg(df)), output)
 
-    val actually = spark.sqlContext.read.parquet("test3.parquet")
+    val actually = spark.sqlContext.read.parquet(output)
 
     assertDataFrameEquals(actually, expected)
-
 
   }
 
