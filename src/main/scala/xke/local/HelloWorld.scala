@@ -1,27 +1,34 @@
 package xke.local
 
+import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
 object HelloWorld {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate()
-    val df = spark.read.option("header", true).csv("src/main/resources/departements-france.csv")
-      .groupBy(col("code_region"))
-      .avg(col("code_departement").cast("integer"))
-      .as("avg_dep")
-      .show()
+    val spark = SparkSession.builder().master("local[*]").appName("").getOrCreate()
 
-    // code
-    // src/main/resources/departements-france.csv
     // 1) lire le fichier
     // 2) créer une colonne avec la moyenne des numéro département par code région
     //    code_region, avg_dep, nom_region
     // 3) renommer la colonne moyenne des départements en avg_dep
     // 4) écrire le fichier en parquet
 
+    val df = spark.read.option("header", true).csv("src/main/resources/departements-france.csv")
+      .withColumn("moyenne",col = col("code_region").cast("integer"))
+
+    val newDF = avgDepByReg(dataFrame = df)
+    val newDfName = renameColumn(dataFrame = newDF)
+    newDfName.show
   }
 
-  def avgDepByReg: DataFrame = ???
-  def renameColumn: DataFrame = ???
+  def avgDepByReg(dataFrame: DataFrame): DataFrame = {
+    dataFrame.groupBy(col("code_region"))
+      .avg("moyenne")
+   // dataFrame.groupBy(col("code_region")).avg("code_region").as("avg_dep")
+  }
+
+  def renameColumn(dataFrame: DataFrame): DataFrame = {
+    dataFrame.withColumnRenamed("moyenne","avg_dep")
+  }
 }
