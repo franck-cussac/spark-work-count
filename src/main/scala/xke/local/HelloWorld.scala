@@ -23,12 +23,12 @@ object HelloWorld {
   }
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
-    dataFrame.groupBy(col("code_region"))
-      .avg("moyenne")
+    dataFrame.groupBy("code_region", "nom_region")
+      .agg(avg("code_departement"))
    // dataFrame.groupBy(col("code_region")).avg("code_region").as("avg_dep")
   }
 
   def renameColumn(dataFrame: DataFrame): DataFrame = {
-    dataFrame.withColumnRenamed("moyenne","avg_dep")
+    dataFrame.withColumnRenamed("avg(code_departement)","avg_dep")
   }
 }
