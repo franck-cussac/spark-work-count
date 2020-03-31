@@ -76,7 +76,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     When("I call the rename function")
     val actual = HelloWorld.renameColumn(input)
 
-    Then("")
+    Then("result")
     val expected = spark.sparkContext.parallelize(
       List(
         (75, 10, "Ile de france"),
@@ -87,8 +87,23 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(actual, expected)
   }
 
-//  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
-//
-//  }
+  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
+    Given("a dataframe from file")
+    spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france-short.csv")
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        (84 , 1, "Auvergne-Rhone-Alpes"),
+        (32 , 2, "Hauts-de-France")
+      )
+    ).toDF("code_region", "avg_dep", "nom_region")
+
+    When("I call main")
+    HelloWorld.main(null)
+    val main = spark.read.parquet("src/main/parquet/ex1.parquet")
+
+    Then("result")
+    assertDataFrameEquals(main, expected)
+  }
 
 }
