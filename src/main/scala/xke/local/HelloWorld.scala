@@ -6,6 +6,11 @@ import org.apache.spark.sql.functions._
 object HelloWorld {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate()
+    val df = spark.read.option("header", true).csv("src/main/resources/departements-france.csv")
+      .groupBy(col("code_region"))
+      .avg(col("code_departement").cast("integer"))
+      .as("avg_dep")
+      .show()
 
     // code
     // src/main/resources/departements-france.csv
