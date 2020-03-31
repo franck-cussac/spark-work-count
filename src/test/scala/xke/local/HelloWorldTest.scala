@@ -35,9 +35,24 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }*/
 /*
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
-
-  }
-
+    Given("Une dataframe avec au moins 3 colunnes : code_region , code_departement et nom_region")
+    val input = spark.sparkContext.parallelize(
+      List(
+        (1,2,"toto"),
+        (1,3,"toto"),
+        (1,4,"toto"),
+        (1,5,"toto"),
+        (2,15,"bob"),
+        (2,45,"toto")
+      )
+    ).toDF("code_region","avg(code_departement)" , "nom_region")
+    val expected = spark.sparkContext.parallelize(List(
+      (1,3,"toto"),
+      (2,21,"bob")
+    ))
+  when
+  }*/
+/*
   test("je veux renommer la colonne des moyennes des numéros département") {
 
     Given("une dataframe avec au moins 3 colonnes : nom région, code région et numéro département")
