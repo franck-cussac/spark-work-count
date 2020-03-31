@@ -19,7 +19,7 @@ object HelloWorld {
     val avg_dep_df = avgDepByReg(df)
     val result_df = renameColumn(avg_dep_df)
 
-    result_df.show()
+    result_df.write.parquet("/home/ubuntu/workspace/hadoop/spark-work-count/src/main/resources/parquet")
 
   }
 
@@ -28,11 +28,11 @@ object HelloWorld {
   }
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
-    dataFrame.groupBy(col("code_region"))
-      .avg("code_departement").as("avg_dep")
+    dataFrame.groupBy("code_region", "nom_region")
+      .agg(avg("code_departement"))
   }
 
   def renameColumn(dataFrame: DataFrame): DataFrame = {
-    dataFrame.withColumnRenamed("average", "avg_dep")
+    dataFrame.withColumnRenamed("avg(code_departement)", "avg_dep")
   }
 }
