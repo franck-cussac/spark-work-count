@@ -14,9 +14,23 @@ object HelloWorld {
     //    code_region, avg_dep, nom_region
     // 3) renommer la colonne moyenne des départements en avg_dep
     // 4) écrire le fichier en parquet
+    val df = spark.read.option("header", true).csv("src/main/resources/departements-france.csv")
+    /*  .filter(col("code_region") % 2 === 0)
+      .groupBy(col("code_region")).count()
+      .filter(col("count") >= 5)*/
+    //df.write.parquet("output.parquet")
+    //avgDepByReg(df).show
+
+    val newDf = renameColumn(avgDepByReg(df))
 
   }
 
-  def avgDepByReg: DataFrame = ???
-  def renameColumn: DataFrame = ???
+  def avgDepByReg(df: DataFrame): DataFrame = {
+    df.groupBy(col("code_region"))
+      .avg("code_departement")
+      .as("avg_dep")
+  }
+  def renameColumn(df: DataFrame): DataFrame = {
+    df.withColumnRenamed("average", "avg_dep")
+  }
 }
