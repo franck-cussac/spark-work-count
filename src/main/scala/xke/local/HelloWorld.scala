@@ -24,11 +24,12 @@ object HelloWorld {
   }
 
   def createDateFrame(sparkSession: SparkSession): DataFrame = {
-    sparkSession.read.option("header", true).csv("/src/main/resources/departements-france.csv")
+    sparkSession.read.option("header", true).csv("src/main/resources/departements-france.csv")
   }
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
-    dataFrame.groupBy(col("code_region")).avg("code_departement").as("avg_dep")
+    dataFrame.groupBy(col("code_region"))
+      .avg("code_departement").as("avg_dep")
   }
 
   def renameColumn(dataFrame: DataFrame): DataFrame = {
