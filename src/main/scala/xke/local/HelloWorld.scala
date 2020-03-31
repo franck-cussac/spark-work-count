@@ -28,7 +28,7 @@ object HelloWorld {
   }
 
   def avgDepByReg(df : DataFrame): DataFrame = {
-    df.withColumn("code_departement", col("code_departement").cast("Integer"))
+    df
       .groupBy(col("code_region"), col("nom_region"))
       .agg(
         avg("code_departement")

@@ -37,18 +37,15 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
     Given("une dataframe avec au moins 3 colonnes : nom région, code departement et nom region")
     val input = spark.sparkContext.parallelize(List(
-      (1, 2, "toto"),
-      (1, 3, "titi"),
-      (1, 4, "tata"),
-      (2, 14, "zaza"),
-      (2, 54, "zozo"),
-      (2, 7, "zuzu"),
-      (2, 5, "zeze")
-    )).toDF("code_region", "code_departement", "nom_region")
+      (1, "toto", 2),
+      (1, "toto", 3),
+      (1, "toto", 4),
+      (2, "zaza", 14)
+    )).toDF("code_region", "nom_region", "code_departement")
     val expected = spark.sparkContext.parallelize(List(
-      (1, "toto", 3.0),
-      (2, "zaza", 21.0)
-    )).toDF("code_region", "avg(code_departement)", "nom_region")
+      (1, "toto", 3),
+      (2, "zaza", 14)
+    )).toDF("code_region", "nom_region", "avg(code_departement)")
 
     When("on calcule la moyenne des numéros de départements par région")
     val actual = HelloWorld.avgDepByReg(input)
@@ -60,14 +57,20 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   test("je veux renommer la colonne des moyennes des numéros département") {
 
     Given("une dataframe avec au moins 3 colonnes : nom région, code région et numéro département")
-    val input = ???
-    val expected = ???
+    val input = spark.sparkContext.parallelize(List(
+      (1, "toto", 2),
+      (2, "zaza", 14)
+    )).toDF("code_region", "nom_region", "avg(code_departement)")
+    val expected = spark.sparkContext.parallelize(List(
+      (1, "toto", 2),
+      (2, "zaza", 14)
+    )).toDF("code_region", "nom_region", "avg_dep")
 
-    When("")
-    val actual = HelloWorld.avgDepByReg(input)
+    When("Je renomme")
+    val actual = HelloWorld.renameColumn(input, "avg(code_departement)", "avg_dep")
 
-    Then("")
-    //assertDataFrameEquals(actual, expected)
+    Then("J'ai renommé")
+    assertDataFrameEquals(actual, expected)
   }
 
   test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
