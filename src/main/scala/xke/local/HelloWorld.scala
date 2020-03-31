@@ -16,23 +16,25 @@ object HelloWorld {
     // 4) écrire le fichier en parquet
 
     val df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
+    val exportPath = "src/main/resources/myOutput.parquet"
 
-    val test = df.withColumn("code_departement", col("code_departement").cast("integer"))
-
-    /*val test = df.withColumn("code_departement", col("code_departement").cast("integer"))
-      .groupBy("code_region")
-      .avg("code_departement").as("avg_dep")
-      .show()*/
-    val test2 = avgDepByReg(test)
-    val test3 = renameColumn(test2).show()
+    start(spark, df, exportPath)
   }
 
+  def start(spark: SparkSession, df: DataFrame, exportPath: String) : Unit = {
 
-  //def avgDepByReg: DataFrame = ???
-  //def renameColumn: DataFrame = ???
+    val dfCasted = df.withColumn("code_departement", col("code_departement").cast("integer"))
+
+    val dfAvg = avgDepByReg(dfCasted)
+    val dfRenamed = renameColumn(dfAvg)
+
+    dfRenamed.write.mode(SaveMode.Overwrite).parquet(exportPath)
+  }
 
   def avgDepByReg(dataFrame: DataFrame) : DataFrame = {
-    dataFrame.groupBy("code_region").avg("code_departement")
+    dataFrame.groupBy("code_region", "nom_region")
+      .agg(avg("code_departement"))
+      .select("code_region", "avg(code_departement)", "nom_region")
   }
 
   def renameColumn(dataFrame: DataFrame) : DataFrame = {
