@@ -5,7 +5,7 @@ import org.apache.spark.sql.functions._
 
 object HelloWorld {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate()
+    val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate() // ctrl + Q affiche le type de la variable
 
     // code
     // src/main/resources/departements-france.csv
@@ -15,8 +15,23 @@ object HelloWorld {
     // 3) renommer la colonne moyenne des départements en avg_dep
     // 4) écrire le fichier en parquet
 
+    val df = createDateFrame(spark)
+    val avg_dep_df = avgDepByReg(df)
+    val result_df = renameColumn(avg_dep_df)
+
+    result_df.show()
+
   }
 
-  def avgDepByReg: DataFrame = ???
-  def renameColumn: DataFrame = ???
+  def createDateFrame(sparkSession: SparkSession): DataFrame = {
+    sparkSession.read.option("header", true).csv("/src/main/resources/departements-france.csv")
+  }
+
+  def avgDepByReg(dataFrame: DataFrame): DataFrame = {
+    dataFrame.groupBy(col("code_region")).avg("code_departement").as("avg_dep")
+  }
+
+  def renameColumn(dataFrame: DataFrame): DataFrame = {
+    dataFrame.withColumnRenamed("average", "avg_dep")
+  }
 }
