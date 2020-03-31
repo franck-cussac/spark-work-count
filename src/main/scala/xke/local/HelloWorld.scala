@@ -14,7 +14,7 @@ object HelloWorld {
     val df = readCSVFile(spark, "src/main/resources/departements-france.csv")
     val dfIntColumn = df.withColumn("code_departement", col("code_departement").cast(IntegerType))
     val newDF = avgDepByReg(dataFrame = dfIntColumn)
-    val newDfColumn = newColumn(dataFrame = newDF, columnName = "average", value = col("avg(code_departement)"))
+    val newDfColumn = newColumn(dataFrame = newDF, columnName = "average", value = lit(""))
     val newDfName = renameColumn(dataFrame = newDfColumn, columnName = "avg(code_departement)", newName = "avg_dep")
 
     writeParquet(dataFrame = newDfName, "ParquetResult")
