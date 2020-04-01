@@ -5,8 +5,8 @@ run-hadoop-docker:
 	docker-compose up -d
 
 deploy-local:
-	cp target/*-shaded.jar ansible-deployment/roles/deploy-word-count/files/
-	cd ansible-deployment && ansible-playbook -i inventories/config-local playbook.yml
+    cp target/word-count-0.0.1-SNAPSHOT.jar ansible-deployment/roles/deploy-word-count/files/
+    cd ansible-deployment && ansible-playbook -i inventories/config-local playbook.yml
 
 down-hadoop-docker:
 	docker-compose down
@@ -27,3 +27,4 @@ remove-local-dag:
 
 run-dag-word-count:
 	curl -X POST localhost:8080/api/experimental/dags/word_count/dag_runs -H 'Cache-Control: no-cache' -H 'Content-Type: application/json' -d "{}"
+
