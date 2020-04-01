@@ -6,7 +6,7 @@ import org.apache.spark.sql.functions._
 
 object HelloWorld {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().master("local[*]").appName("").getOrCreate()
+    val spark = SparkSession.builder().getOrCreate()
 
     // 1) lire le fichier
     // 2) créer une colonne avec la moyenne des numéro département par code région
