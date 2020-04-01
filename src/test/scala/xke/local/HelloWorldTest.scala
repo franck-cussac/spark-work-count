@@ -7,37 +7,10 @@ import org.scalatest.{FunSuite, GivenWhenThen}
 import spark.{DataFrameAssertions, SharedSparkSession}
 
 class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertions {
-  val spark = SharedSparkSession.sparkSession
+  val spark: SparkSession = SharedSparkSession.sparkSession
   import spark.implicits._
 
-  /*test("main must create a file with word count result") {
-    Given("input filepath and output filepath")
-    val input = "src/test/resources/input.txt"
-    val output = "src/test/resources/output/v1/parquet"
-
-    When("I call word count")
-    HelloWorld.main(Array(input, output))
-    val expected = spark.sparkContext.parallelize(
-      List(("rapidement",1),
-        ("te",1),
-        ("à",1),
-        ("mots",1),
-        ("des",1),
-        ("s'il",1),
-        ("compter",1),
-        ("Bonjour,",1),
-        ("as",1),
-        ("plait.",1),
-        ("tu",1))
-    ).toDF("word", "count")
-
-    Then("I can read output file and find my values")
-    val actually = spark.sqlContext.read.parquet(output)
-
-    assertDataFrameEquals(actually, expected)
-  }*/
-
-  test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
+  test("Je veux ajouter une colonne avec la moyenne des numéros département par région") {
     Given("Une data frame")
     val input = spark.sparkContext.parallelize(
       List(
@@ -87,9 +60,72 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     columnsSet should not contain "avg(code_departement)"
   }
 
+
+  test("Test si la fonction 'toInteger' supprime les caractères et garde que les chiffres"){
+    val input = "t45"
+    val expected = 45
+
+    val actual = HelloWorld.toInteger(input)
+
+    actual shouldEqual(expected)
+  }
+
+  test("TTest si la fonction 'toInteger' supprime les 0 au début des chiffres"){
+    val input = "t0efrf4f5Y"
+    val expected = 45
+
+    val actual = HelloWorld.toInteger(input)
+
+    actual shouldEqual(expected)
+  }
+
+  test("Test si la fonction 'toInteger' garde le 0 à la fin du résultat"){
+    val input = "t0efrf4f5Y0"
+    val expected = 450
+
+    val actual = HelloWorld.toInteger(input)
+
+    actual shouldEqual(expected)
+  }
+
+
+  test("je veux faire la jointure entre les départements et les villes") {
+    Given("Les départements et les villes, et ce que je souhaite en sortie")
+    val inputDepts = List(
+      (1, 2, "toto"),
+      (1, 3, "toto"),
+      (1, 4, "toto"),
+      (2, 14, "zaza"),
+      (2, 54, "zaza"),
+      (2, 7, "zaza"),
+      (2, 5, "zaza")
+    ).toDF("code_region", "code_departement", "nom_region")
+    val inputCities = List(
+      (2, "Paris"),
+      (3, "Lille"),
+      (4, "Lyon"),
+      (5, "Bordeaux")
+    ).toDF("department_code", "name")
+    val expected = List(
+      (2, "Paris", 1, "toto"),
+      (3, "Lille", 1, "toto"),
+      (4, "Lyon", 1, "toto"),
+      (5, "Bordeaux", 2, "zaza"),
+      (14, null, 2, "zaza"),
+      (54, null, 2, "zaza"),
+      (7, null, 2, "zaza")
+    ).toDF("code_departement", "name", "code_region", "nom_region")
+
+    When("Je fais la jointure")
+    val actual = HelloWorld.joinCitiesAndDepartment(inputDepts, inputCities)
+
+    Then("La jointure devrait être correcte")
+    assertDataFrameEquals(actual, expected)
+  }
+
+  //Test d'intégration
   test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
     Given("Un chemin vers un jeu de de données et un chemin où stocker le résultat")
-    val spark =  SparkSession.builder().master("local[*]").appName("test").getOrCreate()
     val pathResult = "result"
     val pathData   = "src/main/resources/departements-france.csv"
     val args = Array(pathData, pathResult)
