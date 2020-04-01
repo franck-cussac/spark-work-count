@@ -18,8 +18,7 @@ object HelloWorld {
     val newDfName = renameColumn(dataFrame = newDfColumn, columnName = "avg(code_departement)", newName = "avg_dep")
 
     writeParquet(dataFrame = newDfName, "ParquetResult")
-
-    spark.read.parquet("ParquetResult").show
+    showParquet(spark ,"ParquetResult")
   }
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
@@ -34,11 +33,16 @@ object HelloWorld {
     dataFrame.withColumn(columnName, value)
   }
 
-  def writeParquet(dataFrame: DataFrame, outputName: String){
+  def writeParquet(dataFrame: DataFrame, outputName: String): DataFrame = {
     dataFrame.write.mode(SaveMode.Overwrite).parquet(outputName)
+    dataFrame
   }
 
   def readCSVFile(spark: SparkSession, pathToFile: String): DataFrame = {
     spark.read.option("delimiter", ",").option("header", true).csv(pathToFile)
+  }
+
+  def showParquet(spark: SparkSession, pathToFile: String){
+    spark.read.parquet(pathToFile).show
   }
 }
