@@ -24,3 +24,5 @@ scalerPath
 
 output
 reminder
+
+*.parquet

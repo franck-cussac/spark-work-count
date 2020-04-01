@@ -8,7 +8,7 @@ object HelloWorld {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder()
       .appName("test")
-      .master("local[*]")
+      //.master("local[*]")
       .getOrCreate()
     import spark.implicits._
 
