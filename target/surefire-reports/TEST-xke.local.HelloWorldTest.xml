@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuite 
-errors="0" failures="0" hostname="Hitagi" name="xke.local.HelloWorldTest" tests="3" time="18.133" timestamp="2020-03-31T15:35:47">
+errors="0" failures="0" hostname="Hitagi" name="xke.local.HelloWorldTest" tests="4" time="16.872" timestamp="2020-04-01T12:27:52">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment">
     </property>
@@ -91,13 +91,16 @@ errors="0" failures="0" hostname="Hitagi" name="xke.local.HelloWorldTest" tests=
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
   <testcase 
-  name="je veux ajouter une colonne avec la moyenne des numéros département par région" classname="xke.local.HelloWorldTest" time="6.658">
+  name="je veux ajouter une colonne avec la moyenne des numéros département par région" classname="xke.local.HelloWorldTest" time="6.377">
 </testcase>
   <testcase 
-  name="je veux renommer la colonne des moyennes des numéros département" classname="xke.local.HelloWorldTest" time="2.498">
+  name="je veux renommer la colonne des moyennes des numéros département" classname="xke.local.HelloWorldTest" time="2.243">
 </testcase>
   <testcase 
-  name="je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet" classname="xke.local.HelloWorldTest" time="8.963">
+  name="je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet" classname="xke.local.HelloWorldTest" time="7.919">
+</testcase>
+  <testcase 
+  name="join test" classname="xke.local.HelloWorldTest" time="0.319">
 </testcase>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

@@ -1,19 +1,20 @@
 Discovery starting.
-Discovery completed in 2 seconds, 697 milliseconds.
-Run starting. Expected test count is: 3
+Discovery completed in 2 seconds, 494 milliseconds.
+Run starting. Expected test count is: 4
 HelloWorldTest:
-- je veux ajouter une colonne avec la moyenne des num?ros d?partement par r?gion (6 seconds, 652 milliseconds)
+- je veux ajouter une colonne avec la moyenne des num?ros d?partement par r?gion (6 seconds, 375 milliseconds)
   + Given dataframe avec 3 colonnes : nom r?gion, code r?gion, num?ro d?partement 
   + When calcule average 
   + Then return ok 
-- je veux renommer la colonne des moyennes des num?ros d?partement (2 seconds, 498 milliseconds)
+- je veux renommer la colonne des moyennes des num?ros d?partement (2 seconds, 242 milliseconds)
   + Given dataframe avec 3 colonnes : nom r?gion, code r?gion, moyenne des d?partements 
   + When rename column 
   + Then column renamed 
-- je veux v?rifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet (8 seconds, 963 milliseconds)
+- je veux v?rifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet (7 seconds, 919 milliseconds)
   + When calcule average 
-Run completed in 20 seconds, 851 milliseconds.
-Total number of tests run: 3
+- join test (319 milliseconds)
+Run completed in 19 seconds, 391 milliseconds.
+Total number of tests run: 4
 Suites: completed 2, aborted 0
-Tests: succeeded 3, failed 0, canceled 0, ignored 0, pending 0
+Tests: succeeded 4, failed 0, canceled 0, ignored 0, pending 0
 All tests passed.
