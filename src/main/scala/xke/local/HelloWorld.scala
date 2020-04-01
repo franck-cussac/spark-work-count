@@ -7,25 +7,25 @@ object HelloWorld {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate()
 
-    val df = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france-short.csv")
-    val avg = avgDepByReg(df)
-    val rename = renameColumn(avg)
-    rename.show()
-    writeToParquet(rename)
+    val dframe = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")
+    val average = avgDepByReg(dframe)
+    val renameCol = renameColumn(average)
+    renameCol.show()
+    writeToParquet(renameCol)
   }
 
-  def avgDepByReg(input: DataFrame): DataFrame = {
-    return input
+  def avgDepByReg(df: DataFrame): DataFrame = {
+    return df
       .groupBy("code_region", "nom_region")
-      .agg(avg("code_departement")/*, first("nom_region").as("nom_region")*/)
+      .agg(avg("code_departement"))
   }
 
-  def renameColumn(input: DataFrame): DataFrame = {
-    return input
+  def renameColumn(df: DataFrame): DataFrame = {
+    return df
       .withColumnRenamed("avg(code_departement)", "avg_dep")
   }
 
-  def writeToParquet(input: DataFrame)  = {
-    input.write.mode("overwrite").parquet("src/main/parquet/ex1.parquet")
+  def writeToParquet(df: DataFrame)  = {
+    df.write.mode("overwrite").parquet("src/main/parquet/ex1.parquet")
   }
 }

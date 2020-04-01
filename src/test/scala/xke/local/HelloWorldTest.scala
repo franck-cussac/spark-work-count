@@ -29,7 +29,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     When("J'applique ma fonction avgDepByReg je dois avoir une colonne avec la moyenne des numéros département par région")
     val actual =   HelloWorld.avgDepByReg(input)
     assertDataFrameEquals(actual, expected);
-  }
+  } //PROF
 
   test("je veux renommer la colonne des moyennes des numéros département") {
     val input = spark.sparkContext.parallelize(List(
@@ -49,8 +49,8 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(actual, expected)
   }
 
-  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
-    Given("a dataframe from file")
+  /*test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
+    Given("un dataframe depuis un fichier")
     spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")
 
     val expected = spark.sparkContext.parallelize(
@@ -60,13 +60,11 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
       )
     ).toDF("code_region", "avg_dep", "nom_region")
 
-    When("I call main")
+    When("Je fais appel au main")
     HelloWorld.main(null)
     val main = spark.read.parquet("src/main/parquet/ex1.parquet")
 
     Then("result")
     assertDataFrameEquals(main, expected)
-  }
-
-
+  }*/
 }
