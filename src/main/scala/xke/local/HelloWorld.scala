@@ -5,7 +5,7 @@ import org.apache.spark.sql.functions._
 
 object HelloWorld {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().master("local[*]").appName("Salut Monde").getOrCreate()
+    val spark = SparkSession.builder().getOrCreate()
 
     // src/main/resources/departements-france.csv
     // 1) lire le fichier
