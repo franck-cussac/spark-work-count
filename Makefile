@@ -5,7 +5,7 @@ run-hadoop-docker:
 	docker-compose up -d
 
 deploy-local:
-	cp target/*-shaded.jar ansible-deployment/roles/deploy-word-count/files/
+	cp target/*-SNAPSHOT.jar ansible-deployment/roles/deploy-word-count/files/
 	cd ansible-deployment && ansible-playbook -i inventories/config-local playbook.yml
 
 down-hadoop-docker:
