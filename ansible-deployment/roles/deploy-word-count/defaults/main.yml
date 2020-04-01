@@ -11,7 +11,7 @@ jar_version: "0.0.1-SNAPSHOT"
 group_id: "xke.local"
 main_class: "{{ group_id }}.HelloWorld"
 
-app_directory: "/project/xke"
+app_directory: "/project/xke/jeremie-roland"
 jar_path: "{{ app_directory }}/{{ jar_name }}"
 file_dag: "word-count-dag.py"
 
