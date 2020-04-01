@@ -71,4 +71,40 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     Then("On devrait obtenir le DF après le renommage")
     assertDataFrameEquals(actual, expected)
   }
+
+  test("je veux convertir '033' en int") {
+    Given("une string '033', et ce que je souhaite : 33")
+    val input = "033"
+    val expected = 33
+
+    When("Je convertit en int")
+    val actual = HelloWorld.stringToInt(input)
+
+    Then("je devrais obtenir 33")
+    assert(actual === expected)
+  }
+
+  test("je veux convertir 'A33' en int") {
+    Given("une string 'A33', et ce que je souhaite : 33")
+    val input = "A33"
+    val expected = 33
+
+    When("Je convertit en int")
+    val actual = HelloWorld.stringToInt(input)
+
+    Then("je devrais obtenir 33")
+    assert(actual === expected)
+  }
+
+  test("je veux convertir '33' en int") {
+    Given("une string '33', et ce que je souhaite : 33")
+    val input = "33"
+    val expected = 33
+
+    When("Je convertit en int")
+    val actual = HelloWorld.stringToInt(input)
+
+    Then("je devrais obtenir 33")
+    assert(actual === expected)
+  }
 }

@@ -16,6 +16,7 @@ object HelloWorld {
     // 3) renommer la colonne moyenne des départements en avg_dep
     // 4) écrire le fichier en parquet
 
+    // main classique
     if (args.length == 0) {
       val df = spark.read.option("header", true).csv("src/main/resources/departements-france.csv")
         .withColumn("code_departement", col("code_departement").cast("integer"))
@@ -26,6 +27,8 @@ object HelloWorld {
         )
       )
     }
+
+    // pour les tests
     else {
       val df = spark.sparkContext.parallelize(List(
         (1, 2, "toto"),
@@ -53,5 +56,14 @@ object HelloWorld {
   }
   def writeParquet(df: DataFrame): Unit = {
     df.write.mode("overwrite").parquet("src/main/parquets/output.parquet")
+  }
+
+  // créer une UDF :
+  //1) qui prend un String en paramètre et renvoie un Int
+  //2) si votre String commence par un 0, on l'enlève
+  //3) si votre String contient un caractère non numérique, on l'enlève
+  //4) rédiger un test unitaire sur la fonction
+  def stringToInt(s: String): Int = {
+    if (s.startsWith("0") || !s.charAt(0).isDigit) s.substring(1).toInt else s.toInt
   }
 }
