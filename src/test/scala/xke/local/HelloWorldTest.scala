@@ -81,6 +81,8 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
   test("Sauvegarde mon fichier en parquet") {
     Given("Je lis mon parquet")
+    HelloWorld.main(null)
+
     //val input = "src/main/resources/departements-france.csv"
     val actual = spark.read.parquet("src/main/parquet/ex1")
     When("Je compte le nombre de colonne de mon parquet")
