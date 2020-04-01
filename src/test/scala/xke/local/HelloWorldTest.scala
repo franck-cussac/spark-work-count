@@ -89,9 +89,9 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     HelloWorld.main(Array("", ""))
 
 
-    val actually = spark.read.parquet("C:\\hadoop\\project\\spark-work-count\\src\\main\\data\\region\\")
+    val actually = spark.read.parquet("src\\main\\data\\region\\")
 
-    val df = spark.read.option("sep", ",").option("header", true).csv("C:\\hadoop\\project\\spark-work-count\\src\\main\\resources\\departements-france.csv")
+    val df = spark.read.option("sep", ",").option("header", true).csv("src\\main\\resources\\departements-france.csv")
     val av = HelloWorld.avgDepByReg(df)
     val expected = HelloWorld.renameColumn(av, "avg_dep", "avg_departement")
 

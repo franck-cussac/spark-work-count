@@ -15,14 +15,14 @@ object HelloWorld {
     // 3) renommer la colonne moyenne des départements en avg_dep
     // 4) écrire le fichier en parquet
 
-    val df = spark.read.option("sep", ",").option("header", true).csv("C:\\hadoop\\project\\spark-work-count\\src\\main\\resources\\departements-france.csv")
+    val df = spark.read.option("sep", ",").option("header", true).csv("src\\main\\resources\\departements-france.csv")
     val avg = avgDepByReg(df)
     avg.show
 
     val renamed = renameColumn(avg, "avg_dep", "avg_departement")
     renamed.show
 
-    renamed.write.mode("overwrite").parquet("C:\\hadoop\\project\\spark-work-count\\src\\main\\data\\region\\")
+    renamed.write.mode("overwrite").parquet("src\\main\\data\\region\\")
   }
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
