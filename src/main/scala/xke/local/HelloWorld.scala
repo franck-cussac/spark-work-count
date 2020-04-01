@@ -14,7 +14,7 @@ object HelloWorld {
     // 3) renommer la colonne moyenne des départements en avg_dep
     // 4) écrire le fichier en parquet
 
-    val df = spark.read.option("delimiter", ",").option("header", value = true).csv("src/main/resources/departements-france.csv")
+    val df = spark.read.option("delimiter", ",").option("header", value = true).csv("src/main/resources/departements-france-small.csv")
     val newDF = getAverageDepartmentNumberByRegion(df)
     val newDfName = renameAverageColumn(newDF)
     newDfName.show()
