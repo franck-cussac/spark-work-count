@@ -5,7 +5,7 @@ import org.apache.spark.sql.functions._
 
 object HelloWorld {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().appName("Angelo").master("local[*]").getOrCreate()
+    val spark = SparkSession.builder().appName("Angelo").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
 
     /*val df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
