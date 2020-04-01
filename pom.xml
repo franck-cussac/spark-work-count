@@ -104,8 +104,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>worNd-count-${project.version}-shaded</finalName>
-                    <!--<filters>
+                    <finalName>word-count-${project.version}-shaded</finalName>
+                    <filters>
                         <filter>
                             <artifact>*:*</artifact>
                             <excludes>
@@ -114,7 +114,7 @@
                                 <exclude>META-INF/*.RSA</exclude>
                             </excludes>
                         </filter>
-                    </filters>-->
+                    </filters>
                     <!-- Additional configuration. -->
                 </configuration>
             </plugin>
