@@ -1,6 +1,5 @@
 package xke.local
 
-import org.assertj.core.api.Assertions
 import org.scalatest.{FunSuite, GivenWhenThen}
 import spark.{DataFrameAssertions, SharedSparkSession}
 
