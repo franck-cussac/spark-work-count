@@ -5,7 +5,7 @@ import org.apache.spark.sql.functions._
 
 object HelloWorld {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().appName("test").getOrCreate()
+    val spark = SparkSession.builder().getOrCreate()
     import spark.implicits._
 
     // code
