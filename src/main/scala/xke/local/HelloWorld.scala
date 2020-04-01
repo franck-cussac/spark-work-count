@@ -46,6 +46,7 @@ object HelloWorld {
 
   def write(dataFrame: DataFrame, path: String) = {
     dataFrame.write
+      .mode("overwrite")
       .parquet(path)
   }
 
