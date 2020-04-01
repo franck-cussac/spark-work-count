@@ -45,6 +45,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }
 
 /*  test("main must create a file with word count result") {
+
     Given("input filepath and output filepath")
     val input = "src/test/resources/input.txt"
     val output = "src/test/resources/output/v1/parquet"
