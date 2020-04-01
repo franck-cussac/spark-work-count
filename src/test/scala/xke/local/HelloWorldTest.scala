@@ -112,10 +112,10 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
       .toDF("nom_region", "code_region", "code_departement")
 
     When("Call function rename")
-    HelloWorld.write(input,"C:\\Users\\christopher\\Downloads\\sort\\file.parquet")
+    HelloWorld.write(input,"src/main/resources/file.parquet")
 
     Then("Read  File when is ok")
-    assert(spark.read.parquet("C:\\Users\\christopher\\Downloads\\sort\\file.parquet").columns.length === 3)
+    assert(spark.read.parquet("src/main/resources/file.parquet").columns.length === 3)
   }
 
 }

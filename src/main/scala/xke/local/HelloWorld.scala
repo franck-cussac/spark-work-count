@@ -25,7 +25,7 @@ object HelloWorld {
     val dfRename = renameColumn(dfAvg, "avg_departement", "avg_dep")
 
     // 4
-    write(dfRename, "C:\\Users\\christopher\\Downloads\\sort\\file.parquet")
+    write(dfRename, "src/main/resources/file.parquet")
 
     // Display
     dfRename.show
