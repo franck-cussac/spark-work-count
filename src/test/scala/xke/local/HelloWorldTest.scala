@@ -44,7 +44,8 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(actual, expected)
   }
 
-  test("main must create a file with word count result") {
+/*  test("main must create a file with word count result") {
+
     Given("input filepath and output filepath")
     val input = "src/test/resources/input.txt"
     val output = "src/test/resources/output/v1/parquet"
@@ -70,7 +71,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     assertDataFrameEquals(actually, expected)
   }
-
+*/
   test("Je veux tester que la lecture d'un fichier, le calcul de moyenne de département selon la région, le renommage d'une colonne et l'écriture du résultat dans un parquet fonctionnent"){
     Given("le lancement de la méthode main")
     HelloWorld.main(null)
