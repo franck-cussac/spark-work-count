@@ -75,7 +75,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     Given("le lancement de la méthode main")
     HelloWorld.main(null)
     When("je vérifie les différentes colonnes du parquet")
-    val df = spark.read.parquet("C:/Users/Bristouflex/Desktop/Projets/spark-work-count/src/main/resources/toto")
+    val df = spark.read.parquet("src/main/resources/toto")
     Then("les colonnes doivent être les même que dans le jeu de données de résultat")
     assert(df("avg_dep") != null && df("nom_region") != null && df("code_region") != null)
   }

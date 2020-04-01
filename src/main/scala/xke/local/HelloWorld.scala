@@ -15,7 +15,7 @@ object HelloWorld {
     val newDF = avgDepByReg(dataFrame = df)
     val newDfName = renameColumn(dataFrame = newDF, originalString = "avg(code_departement)", newName = "avg_dep")
     newDfName.show()
-    newDfName.write.parquet("C:/Users/Bristouflex/Desktop/Projets/spark-work-count/src/main/resources/toto")
+    newDfName.write.parquet("src/main/resources/toto")
   }
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
