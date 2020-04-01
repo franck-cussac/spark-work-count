@@ -35,6 +35,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }*/
 
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
+
     Given("une dataframe avec au moins 3 colonnes : nom région, code région et numéro département")
     val input = spark.sparkContext.parallelize(
       List(
@@ -47,7 +48,6 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
         (2, 9, "zaza")
       )
     ).toDF("code_region", "code_departement", "nom_region")
-
     val expected = spark.sparkContext.parallelize(
       List(
         (1, 3, "toto"),
@@ -58,9 +58,8 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     When("On regroupe les donnée par code_region, par nom_region et on fait un average du code_departement")
     val actual = HelloWorld.avgDepByReg(input)
 
-    Then("On option un dataframe avec 3 colone, le nom région, le code région et l'avg du numéro département")
+    Then("On optien un dataframe avec 3 colone, le nom région, le code région et l'avg du numéro département")
     assertDataFrameEquals(actual, expected)
-
   }
 
   test("je veux renommer la colonne des moyennes des numéros département") {
@@ -79,10 +78,10 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
       )
     ).toDF("code_region", "avg_dep", "nom_region")
 
-    When("")
+    When("J'execute ma fonction de renommage")
     val actual = HelloWorld.renameColumn(input)
 
-    Then("")
+    Then("On a un dataframe a 3 colonnes : nom_région, code_région et numéro_département")
     assertDataFrameEquals(actual, expected)
   }
 
