@@ -3,7 +3,7 @@
     <groupId>xke.local</groupId>
     <artifactId>word-count</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT-shaded</version>
 
     <properties>
         <scala.version>2.11</scala.version>
