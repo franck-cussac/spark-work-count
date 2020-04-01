@@ -6,7 +6,7 @@ run-hadoop-docker:
 
 deploy-local:
 	cp target/word-count-0.0.1-SNAPSHOT.jar ansible-deployment/roles/deploy-word-count/files/word-count-0.0.1-SNAPSHOT-shaded.jar
-    cd ansible-deployment && ansible-playbook -i inventories/config-local playbook.yml
+	cd ansible-deployment && ansible-playbook -i inventories/config-local playbook.yml
 
 down-hadoop-docker:
 	docker-compose down
