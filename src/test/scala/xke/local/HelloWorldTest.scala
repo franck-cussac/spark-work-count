@@ -45,18 +45,13 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
       )
     ).toDF("nom_region", "code_region", "code_departement")
 
-
     val expected = spark.sparkContext.parallelize(
       List(
         (44 , 52, "Grand Est"),
         ( 1 , 50, "Guadeloupe")
       )
     ).toDF("code_region", "avg(code_departement)", "nom_region")
-
-    When("calcul average")
     val actual = HelloWorld.avgDepByReg(input)
-
-    Then("return ok")
     assertDataFrameEquals(actual, expected)
 
   }
@@ -71,7 +66,6 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
       )
     ).toDF("code_region", "avg(code_departement)", "nom_region")
 
-
     val expected = spark.sparkContext.parallelize(
       List(
         (44 , 52, "Grand Est"),
@@ -79,10 +73,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
       )
     ).toDF("code_region", "avg_dep", "nom_region")
 
-    When("rename column")
     val actual = HelloWorld.renameColumn(input)
-
-    Then("column renamed")
     assertDataFrameEquals(actual, expected)
   }
 
@@ -90,7 +81,6 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
   test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
     val input = "src/test/resources/departements-france.csv"
-
 
     val expected = spark.sparkContext.parallelize(
       List(
@@ -100,11 +90,8 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     ).toDF("code_region", "avg_dep", "nom_region")
 
     val df = spark.read.option("sep", ",").option("header", true).csv(input)
-
-    When("calcule average")
-    HelloWorld.renameColumn(HelloWorld.avgDepByReg(df)).write.mode("overwrite").parquet("test3.parquet")
-
-    val actually = spark.sqlContext.read.parquet("test3.parquet")
+    HelloWorld.renameColumn(HelloWorld.avgDepByReg(df)).write.mode("overwrite").parquet("parquet")
+    val actually = spark.sqlContext.read.parquet("parquet")
 
     assertDataFrameEquals(actually, expected)
   }

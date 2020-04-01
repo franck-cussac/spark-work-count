@@ -14,11 +14,8 @@ object HelloWorld {
       .filter(col("count" )> 5)
 
      */
-    val df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")/*
-      .groupBy(col("code_region"))
-      .avg("code_region")
-      .as("avg_dep").show()*/
-
+    
+    val df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
     // code
 
     // src/main/resources/departements-france.csv
