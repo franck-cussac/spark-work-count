@@ -1,16 +1,16 @@
 Discovery starting.
-Discovery completed in 2 seconds, 765 milliseconds.
+Discovery completed in 2 seconds, 610 milliseconds.
 Run starting. Expected test count is: 2
 HelloWorldTest:
-- je veux ajouter une colonne avec la moyenne des numéros département par région (10 seconds, 117 milliseconds)
+- je veux ajouter une colonne avec la moyenne des numéros département par région (9 seconds, 235 milliseconds)
   + Given input et expected 
   + When Calcul de la moyenne des numéros de départements par région 
   + Then Retrouver les moyennes par régions des départements 
-- je veux renommer la colonne des moyennes des numéros département (4 seconds, 822 milliseconds)
+- je veux renommer la colonne des moyennes des numéros département (3 seconds, 883 milliseconds)
   + Given input et expected 
   + When Calcul de la moyenne des numéros de départements par région et renomme colonne 
   + Then Colonne renommée 
-Run completed in 17 seconds, 783 milliseconds.
+Run completed in 15 seconds, 775 milliseconds.
 Total number of tests run: 2
 Suites: completed 2, aborted 0
 Tests: succeeded 2, failed 0, canceled 0, ignored 0, pending 0

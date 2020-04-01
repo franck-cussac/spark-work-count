@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuite 
-errors="0" failures="0" hostname="Predator" name="xke.local.HelloWorldTest" tests="2" time="13.138" timestamp="2020-04-01T15:19:24">
+errors="0" failures="0" hostname="Predator" name="org.scalatest.tools.DiscoverySuite" tests="0" time="13.142" timestamp="2020-04-01T15:19:24">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment">
     </property>
@@ -85,12 +85,6 @@ errors="0" failures="0" hostname="Predator" name="xke.local.HelloWorldTest" test
     <property name="sun.desktop" value="windows"/>
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
-  <testcase 
-  name="je veux ajouter une colonne avec la moyenne des numéros département par région" classname="xke.local.HelloWorldTest" time="9.239">
-</testcase>
-  <testcase 
-  name="je veux renommer la colonne des moyennes des numéros département" classname="xke.local.HelloWorldTest" time="3.884">
-</testcase>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

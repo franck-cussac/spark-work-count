@@ -2,6 +2,7 @@ package xke.local
 
 import org.scalatest.{FunSuite, GivenWhenThen}
 import spark.{DataFrameAssertions, SharedSparkSession}
+import xke.local.HelloWorld.{avgDepByReg, renameColumn}
 
 class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertions {
     val spark = SharedSparkSession.sparkSession
@@ -80,28 +81,21 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
         var actual = HelloWorld.avgDepByReg(input)
         actual = HelloWorld.renameColumn(actual)
 
-        actual.show()
-
         Then("Colonne renommée")
         assertDataFrameEquals(actual, expected)
     }
 
-    /*test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
-        val input = spark.sparkContext.parallelize(List(
-            (1, 2, "toto"),
-            (1, 3, "toto"),
-            (1, 4, "toto"),
-            (2, 14, "zaza"),
-            (2, 54, "zaza"),
-            (2, 7, "zaza"),
-            (2, 9, "zaza")
-        )).toDF("code_region", "code_departement", "nom_region")
-        val expected = spark.sparkContext.parallelize(List(
-            (1, 3, "toto"),
-            (2, 21, "zaza")
-        )).toDF("code_region", "avg(code_departement)", "nom_region")
+    test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
+        Given("Write parquet")
+        var df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
+        df = avgDepByReg(df)
+        df = renameColumn(df)
+        df.write.parquet("parquet")
 
-        input shouldEqual expected
-    }*/
+        When("Read parquet")
+        val parquet = spark.read.parquet("parquet")
 
+        Then("Meme DataFrame")
+        assertDataFrameEquals(parquet, df)
+    }
 }
