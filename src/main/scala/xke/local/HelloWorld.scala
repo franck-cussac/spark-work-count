@@ -52,9 +52,7 @@ object HelloWorld {
 
   def firstWork(dataFrame: DataFrame): DataFrame = {
     val dfClean = cleanDf(dataFrame)
-    dfClean.show()
     val avg = avgDepByReg(dfClean)
-    avg.show
 
     val renamed = renameColumn(avg, "avg_dep", "avg_departement")
     renamed.write.mode("overwrite").parquet("src/main/data/region/")
@@ -96,7 +94,7 @@ object HelloWorld {
       , "inner"
     ).drop("code")
 
-    joined_df.write.mode("overwrite").parquet("src/main/data/region_2/")
+    joined_df.write.partitionBy("region_code","department_code").mode("overwrite").parquet("src/main/data/region_2/")
     joined_df
   }
 }

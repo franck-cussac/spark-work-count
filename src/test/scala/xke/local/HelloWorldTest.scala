@@ -9,33 +9,6 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   val spark = SharedSparkSession.sparkSession
   import spark.implicits._
 
-  /*test("main must create a file with word count result") {
-    Given("input filepath and output filepath")
-    val input = "src/test/resources/input.txt"
-    val output = "src/test/resources/output/v1/parquet"
-
-    When("I call word count")
-    HelloWorld.main(Array(input, output))
-    val expected = spark.sparkContext.parallelize(
-      List(("rapidement",1),
-        ("te",1),
-        ("à",1),
-        ("mots",1),
-        ("des",1),
-        ("s'il",1),
-        ("compter",1),
-        ("Bonjour,",1),
-        ("as",1),
-        ("plait.",1),
-        ("tu",1))
-    ).toDF("word", "count")
-
-    Then("I can read output file and find my values")
-    val actually = spark.sqlContext.read.parquet(output)
-
-    assertDataFrameEquals(actually, expected)
-  }*/
-
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
     Given("dataframe avec 3 colonnes : nom région, code région, numé département")
     val input = spark.sparkContext.parallelize(
@@ -104,15 +77,15 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   test("je veux vérifier que je joins les trois fichiers et sauvegardes mon fichier en parquet") {
     val dfCities = spark.sparkContext.parallelize(
       List(
-        (1,"01","01001","01400","L'Abergement-Clémenciat","l abergement clemenciat",46.156781992032,4.9246992031872),
-        (2,"01","01002","01640","L'Abergement-de-Varey","l abergement de varey",46.010085625,5.4287591666667),
-        (938,"02","02543","02470","Neuilly-Saint-Front","neuilly saint front",49.167268791946,3.2576386577181)
+        (1,"1","01001","01400","L'Abergement-Clémenciat","l abergement clemenciat",46.156781992032,4.9246992031872),
+        (2,"1","01002","01640","L'Abergement-de-Varey","l abergement de varey",46.010085625,5.4287591666667),
+        (938,"2","02543","02470","Neuilly-Saint-Front","neuilly saint front",49.167268791946,3.2576386577181)
       )
     ).toDF("id","department_code","insee_code","zip_code","name","slug","gps_lat","gps_lng")
     val dfDepartments = spark.sparkContext.parallelize(
       List(
-        (1,84,"01","Ain","ain"),
-        (2,32,"02","Aisne","aisne")
+        (1,84,"1","Ain","ain"),
+        (2,32,"2","Aisne","aisne")
       )
     ).toDF("id","region_code","code","name","slug")
     val dfRegions = spark.sparkContext.parallelize(
