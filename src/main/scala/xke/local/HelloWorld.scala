@@ -3,6 +3,8 @@ package xke.local
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
+import org.apache.spark.sql.expressions.UserDefinedFunction
+
 object HelloWorld {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate()
@@ -12,6 +14,10 @@ object HelloWorld {
     val renameCol = renameColumn(average)
     renameCol.show()
     writeToParquet(renameCol)
+  }
+
+  def stringToInt(str: String): Int = {
+    str.filter(Character.isDigit).toInt
   }
 
   def avgDepByReg(df: DataFrame): DataFrame = {
@@ -28,4 +34,7 @@ object HelloWorld {
   def writeToParquet(df: DataFrame)  = {
     df.write.mode("overwrite").parquet("src/main/parquet/ex1.parquet")
   }
+  val stringToIntUdf: UserDefinedFunction = udf(stringToInt _ )
+
+
 }

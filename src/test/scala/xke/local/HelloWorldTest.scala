@@ -49,22 +49,27 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(actual, expected)
   }
 
-  /*test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
-    Given("un dataframe depuis un fichier")
-    spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")
+  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
 
-    val expected = spark.sparkContext.parallelize(
-      List(
-        (84 , 1, "Auvergne-Rhone-Alpes"),
-        (32 , 2, "Hauts-de-France")
-      )
-    ).toDF("code_region", "avg_dep", "nom_region")
+    Given("Je fait des opération de transformation d'ajout de colonne et de renommage avant de générer mon parquet")
+    //HelloWorld.main(null)
 
-    When("Je fais appel au main")
-    HelloWorld.main(null)
-    val main = spark.read.parquet("src/main/parquet/ex1.parquet")
+    When("Je lit mon fichier parquet")
+    val input = spark.read.parquet("src/main/parquet/ex1.parquet")
 
-    Then("result")
-    assertDataFrameEquals(main, expected)
-  }*/
+    Then("J'ai le bon nombre de colonne dans mon fichier")
+    val expected = 3
+    val actual = assert(input.columns.length === expected)
+
+  }
+
+  test("Je veut convertir une chaine de caractère en nombre") {
+    Given("Une chaine de caractère composée de chiffre et de lettres")
+    val input = "045d45"
+    When("Quand jexécute la fonction")
+    val expected = 4545
+    val actual = HelloWorld.stringToInt(input)
+    Then("J'ai le résultat attendu")
+    assert(actual === expected)
+  }
 }
