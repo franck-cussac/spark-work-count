@@ -79,17 +79,18 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(actual, expected)
   }
 
+
   test("Sauvegarde mon fichier en parquet") {
     Given("Je lis mon parquet")
     HelloWorld.main(null)
 
-    //val input = "src/main/resources/departements-france.csv"
-    val actual = spark.read.parquet("src/main/parquet/ex1")
+    val actual = spark.read.parquet("src/main/ex1/parquet")
     When("Je compte le nombre de colonne de mon parquet")
 
-    val expected = 3
 
     Then("Le nombre de colonne doit être 3")
+    val expected = 3
+
     assert(actual.columns.length === expected)
   }
 
@@ -103,10 +104,55 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     When("Je supprime les lettres")
     val actual = HelloWorld.parseInteger(s)
 
-    Then("Le nombre de colonne devrait être 15")
+    Then("L'entier qui ressort doit être 15")
     assert(actual === expected)
   }
 
 
+  test("Test de la jointure") {
+
+    Given("Je possede deux dataFrames")
+    val input1 = spark.sparkContext.parallelize(List(
+      (1, 75,"bob"),
+      (2,13,"boby"),
+      ( 1, 92,"toto"),
+      (2, 69,"dupond")
+    )).toDF( "code_region", "code_departement","nom_region")
+
+
+    val input2 = spark.sparkContext.parallelize(List(
+      (75,"Paris"),
+      (13,"Marseille"),
+      (69,"Lyon"),
+      (92,"Nanterre")
+    )).toDF("department_code","nom_ville")
+
+    When("J'effectue une jointure sur les 2 dataframes'")
+    val actual = HelloWorld.joinDf(input1,input2)
+
+    val expected = spark.sparkContext.parallelize(List(
+      (2,13,"boby",13,"Marseille"),
+      (1,92,"toto",92,"Nanterre"),
+      (2, 69,"dupond" ,69,"Lyon"),
+      ( 1, 75,"bob",75,"Paris")
+    )).toDF("code_region","code_departement","nom_region","department_code" ,"nom_ville")
+    Then("Je devrais avoir 5 colonne")
+
+    assertDataFrameEquals(actual,expected)
+  }
+
+  test("Test de la création des partitions") {
+    Given("Je crée ma partition")
+    HelloWorld.main(null)
+
+    When("Je compte le nombre de colonne de mon parquet")
+    val actual = spark.read.parquet("src/main/parquet/code_region=04/code_departement=974/")
+
+
+    Then("Le nombre de colonne doit être 3")
+    val expected = 10
+
+    assert(actual.columns.length === expected)
+  }
 
 }

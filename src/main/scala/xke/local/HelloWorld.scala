@@ -4,7 +4,6 @@ import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.json4s.DateFormat
 
 object HelloWorld {
   def main(args: Array[String]): Unit = {
@@ -18,21 +17,21 @@ object HelloWorld {
 
     val df = spark.read.option("header", true).csv("src/main/resources/departements-france.csv")
       .withColumn("code_departement",toIntegerUdf(col("code_departement")))
-    //.withColumn("moyenne",col = col("code_region").cast("integer"))
 
     val dfCities = spark.read.option("header", true).csv("src/main/resources/cities.csv")
-
 
     val dfAvg = avgDepByReg(df = df)
     val dfRenameC = renameColumn(df = dfAvg)
 
-    df.write.mode("overwrite").parquet("src/main/resources/parquet/ex1/")
-    dfRenameC.write.mode("overwrite").parquet("src/main/parquet/ex1")
+    //df.write.mode(SaveMode.Overwrite).parquet("src/main/resources/parquet/ex1/")
+    dfRenameC.write.mode("overwrite").parquet("src/main/ex1/parquet")
 
     dfRenameC.show
     val dfJoin = joinDf(df,dfCities)
-    //dfJoin
-    // .filter(col("code_departement"),col("nom_departement"),col("code_region"),col("nom_region"),col("zip_code"),col("name"))
+
+    dfJoin.write.mode("overwrite")
+      .partitionBy("code_region","code_departement")
+      .parquet("src/main/parquet")
 
   }
   def parseInteger(s: String): Int = {
