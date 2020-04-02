@@ -16,9 +16,8 @@ object HelloWorld {
     // 3) renommer la colonne moyenne des départements en avg_dep
     // 4) écrire le fichier en parquet
 
-
     // 1
-    val df = fetchDepartements
+    val df = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")
 
     // 2
     val dfAvg = avgDepByReg(df)
@@ -40,6 +39,7 @@ object HelloWorld {
 //      4) pensez à pull la branche master, j'ai corrigé la création du jar
 //      5) pour ceux qui peuvent en local, réessayez de lancer un spark-submit avec --master spark://spark-master:7077 depuis le conteneur worker
 //    Pour les autres, on verra peut être cet après-midi
+
 
   }
 
