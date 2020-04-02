@@ -12,7 +12,7 @@ import org.apache.spark.sql._
 object HelloWorld {
   def main(args: Array[String]): Unit = {
     jointureDepartVille()
-
+    //departementExercises()
   }
 
   def jointureDepartVille(): Unit = {
@@ -22,17 +22,25 @@ object HelloWorld {
 
     val dfDepart = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
     val dfVilles = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/cities.csv")
-    val dfJoined = joinDepart(dfDepart, dfVilles)
+    val dfJoined = doJoinOnDepartCode(dfDepart, dfVilles)
     dfJoined.show()
-
+    writeInPartition(dfJoined, "code_region", "code_departement")
   }
 
-  def joinDepart(dfDepart: DataFrame, dfVilles: DataFrame): DataFrame ={
+  def doJoinOnDepartCode(dfDepart: DataFrame, dfVilles: DataFrame): DataFrame ={
     dfDepart.join(dfVilles,
       dfDepart("code_departement") === dfVilles("department_code"),
       "left_outer"
     )
       .drop("department_code")
+  }
+
+  def writeInPartition(toWrite: DataFrame, col1: String, col2: String): Unit = {
+    toWrite
+      .write
+      .partitionBy(col1, col2)
+      .mode("overwrite")
+      .parquet("src/main/resources/joinPartition")
   }
 
   def departementExercises(): Unit ={

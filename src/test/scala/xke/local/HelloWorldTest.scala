@@ -63,4 +63,47 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assert(HelloWorld.convertToInt(input) === expected)
   }
 
+  test("je veux joindre deux dataFrame sur le champs code_departement") {
+    Given("deux listes présentant le champs code_departement")
+    val inputDepts = spark.sparkContext.parallelize(List(
+      (1, 2, "Ile de France"),
+      (1, 3, "Ile de France"),
+      (1, 4, "Ile de France"),
+      (34, 6, "Haut de France"),
+      (34, 7, "Haut de France"),
+      (34, 5, "Haut de France"),
+      (34, 8, "Haut de France")
+    )).toDF("code_region", "code_departement", "nom_region")
+    val inputCities = spark.sparkContext.parallelize(List(
+      (2, "Paris"),
+      (3, "Strasbourg"),
+      (4, "Nantes"),
+      (5, "Toulouse")
+    )).toDF("department_code", "name")
+    val expected = spark.sparkContext.parallelize(List(
+      (2, "Paris", 1, "Ile de France"),
+      (3, "Strasbourg", 1, "Ile de France"),
+      (8, null, 34, "Haut de France"),
+      (4, "Nantes", 1, "Ile de France"),
+      (5, "Toulouse", 34, "Haut de France"),
+      (6, null, 34, "Haut de France"),
+      (7, null, 34, "Haut de France")
+    )).toDF("code_departement", "name", "code_region", "nom_region")
+
+    When("Je fais la jointure")
+    val actual = HelloWorld.doJoinOnDepartCode(inputDepts, inputCities)
+
+    Then("La jointure devrait être correcte")
+    assertDataFrameEquals(actual, expected)
+  }
+
+  test("Je veux tester que la jointure de deux DF et leur écriture dans un parquet fonctionne"){
+    Given("le lancement de la méthode main")
+    HelloWorld.jointureDepartVille()
+    When("je vérifie les différentes colonnes du parquet")
+    val df = spark.read.parquet("src/main/resources/joinPartition")
+    Then("les colonnes doivent exister")
+    assert(df("code_region") != null && df("code_departement") != null)
+  }
+
 }
