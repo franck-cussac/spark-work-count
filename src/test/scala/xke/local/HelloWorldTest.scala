@@ -48,6 +48,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
         (2, 9, "zaza")
       )
     ).toDF("code_region", "code_departement", "nom_region")
+
     val expected = spark.sparkContext.parallelize(
       List(
         (1, 3, "toto"),
@@ -101,9 +102,19 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
   test("Je veut convertir une chaine de caractère en nombre") {
     Given("Une chaine de caractère composée de chiffre et de lettres")
-    val input = "045d45"
+    val input = "04"
     When("Quand jexécute la fonction")
-    val expected = "4545"
+    val expected = "4"
+    val actual = HelloWorld.stringToInt(input)
+    Then("J'ai le résultat attendu")
+    assert(actual === expected)
+  }
+
+  test("Je veut convertir une chaine de caractère en nombre") {
+    Given("Une chaine de caractère composée de chiffre et de lettres")
+    val input = "45Z"
+    When("Quand jexécute la fonction")
+    val expected = "45"
     val actual = HelloWorld.stringToInt(input)
     Then("J'ai le résultat attendu")
     assert(actual === expected)
