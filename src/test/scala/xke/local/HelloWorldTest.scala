@@ -92,13 +92,13 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   test("je veux faire la jointure entre les départements et les villes") {
     Given("Les départements et les villes, et ce que je souhaite en sortie")
     val inputDepts = List(
-      (1, 2, "toto"),
-      (1, 3, "toto"),
-      (1, 4, "toto"),
-      (2, 14, "zaza"),
-      (2, 54, "zaza"),
-      (2, 7, "zaza"),
-      (2, 5, "zaza")
+      (1, 2, "test"),
+      (1, 3, "test"),
+      (1, 4, "test"),
+      (2, 14, "test2"),
+      (2, 54, "test2"),
+      (2, 7, "test2"),
+      (2, 5, "test2")
     ).toDF("code_region", "code_departement", "nom_region")
     val inputCities = List(
       (2, "Paris"),
@@ -107,28 +107,29 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
       (5, "Bordeaux")
     ).toDF("department_code", "name")
     val expected = List(
-      (2, "Paris", 1, "toto"),
-      (3, "Lille", 1, "toto"),
-      (4, "Lyon", 1, "toto"),
-      (5, "Bordeaux", 2, "zaza"),
-      (14, null, 2, "zaza"),
-      (54, null, 2, "zaza"),
-      (7, null, 2, "zaza")
+      (2, "Paris", 1, "test"),
+      (3, "Lille", 1, "test"),
+      (4, "Lyon", 1, "test"),
+      (5, "Bordeaux", 2, "test2"),
+      (14, null, 2, "test2"),
+      (54, null, 2, "test2"),
+      (7, null, 2, "test2")
     ).toDF("code_departement", "name", "code_region", "nom_region")
 
-    When("Je fais la jointure")
+    When("J'applique la jointure")
     val actual = HelloWorld.joinCitiesAndDepartment(inputDepts, inputCities)
 
-    Then("La jointure devrait être correcte")
+    Then("La jointure devrait être bonne")
     assertDataFrameEquals(actual, expected)
   }
 
   //Test d'intégration
   test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
     Given("Un chemin vers un jeu de de données et un chemin où stocker le résultat")
-    val pathResult = "result"
-    val pathData   = "src/main/resources/departements-france.csv"
-    val args = Array(pathData, pathResult)
+    val pathResult = "result-output"
+    val departmentPathData   = "src/main/resources/departements-france.csv"
+    val citiesPathData   = "src/main/resources/cities.csv"
+    val args = Array(departmentPathData, citiesPathData, pathResult)
 
     When("On excute le main")
     HelloWorld.main(args)
@@ -136,7 +137,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     Then("Il faut qu'on trouve la nouvelle colonne 'avg_dep' et ne pas trouver la colonne 'avg(code_departement)'")
     val columnsSet =    df.columns.toSet
-    columnsSet shouldEqual  Set("code_region", "avg_dep", "nom_region")
+    columnsSet shouldEqual  Set("code_region", "avg_dep", "nom_region", "code_departement")
     columnsSet should not contain "avg(code_departement)"
     df.select("avg_dep").count() should not equal(0)
   }
