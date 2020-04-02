@@ -25,4 +25,5 @@ scalerPath
 output
 reminder
 
-myOutput.parquet
+avg_output.parquet
+join_output.parquet

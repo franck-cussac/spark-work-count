@@ -4,31 +4,47 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
 object HelloWorld {
+
+  val toIntegerUDF = udf(toInteger _)
+
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate()
+    //val spark = SparkSession.builder().getOrCreate()
 
-    // code
-    // src/main/resources/departements-france.csv
-    // 1) lire le fichier
-    // 2) créer une colonne avec la moyenne des numéro département par code région
-    //    code_region, avg_dep, nom_region
-    // 3) renommer la colonne moyenne des départements en avg_dep
-    // 4) écrire le fichier en parquet
+    val dfDepartment = spark.read.option("delimiter", ",")
+      .option("header", true)
+      .csv("src/main/resources/departements-france.csv")
 
-    val df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
-    val exportPath = "src/main/resources/myOutput.parquet"
+    val dfCities = spark.read.option("delimiter", ",")
+      .option("header", true)
+      .csv("src/main/resources/cities.csv")
 
-    start(spark, df, exportPath)
+    val df1Converted = dfDepartment.withColumn("code_departement", toIntegerUDF(col("code_departement")))
+    val df2Converted = dfCities.withColumn("department_code", toIntegerUDF(col("department_code")))
+
+    startWithAvg(df1Converted, "src/main/resources/avg_output.parquet")
+    startWithJoin(df1Converted, df2Converted, "src/main/resources/join_output.parquet")
   }
 
-  def start(spark: SparkSession, df: DataFrame, exportPath: String) : Unit = {
+  def startWithAvg(dataFrame: DataFrame, exportPath: String) : Unit = {
+    val dfEnrich = dataFrameEnrichment(dataFrame)
+    dfEnrich.write.mode(SaveMode.Overwrite).parquet(exportPath)
+  }
 
-    val dfCasted = df.withColumn("code_departement", col("code_departement").cast("integer"))
+  def startWithJoin(df1: DataFrame, df2: DataFrame, exportPath: String) : Unit = {
+    val dfJoined = joinDataFrame(df1, df2)
+    dfJoined.write.partitionBy("code_region", "code_departement").mode(SaveMode.Overwrite).parquet(exportPath)
+  }
 
-    val dfAvg = avgDepByReg(dfCasted)
-    val dfRenamed = renameColumn(dfAvg)
+  def toInteger(value: String): Int = value.filter(Character.isDigit).toInt
 
-    dfRenamed.write.mode(SaveMode.Overwrite).parquet(exportPath)
+  def joinDataFrame(dfDepartment: DataFrame, dfCities: DataFrame) : DataFrame = {
+    dfDepartment.join(dfCities, dfDepartment("code_departement") === dfCities("department_code"), "inner")
+  }
+
+  def dataFrameEnrichment(dataFrame: DataFrame) : DataFrame = {
+    val dfAvg = avgDepByReg(dataFrame)
+    renameColumn(dfAvg)
   }
 
   def avgDepByReg(dataFrame: DataFrame) : DataFrame = {
