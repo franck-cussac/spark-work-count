@@ -114,7 +114,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
   }
 
-  test("join test") {
+  /*test("join test") {
     val input = spark.sparkContext.parallelize(
       List(
         (10 , 75, "Ile de france"),
@@ -132,6 +132,28 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     val df = input.join(expected, input("code_region") === expected("code_region"))
     df.show()
+  }*/
+
+  test("je veux vérifier que je les 0 soit supprimé"){
+    val input = "01"
+
+    val actually = HelloWorld.udfZero(input)
+
+    val expected = 1
+
+    assert(actually == expected)
   }
+
+  test("je veux vérifier que le B soit supprimé"){
+    val input = "2A"
+
+    val actually = HelloWorld.udfZero(input)
+
+    val expected = 2
+
+    assert(actually == expected)
+  }
+
+
 
 }

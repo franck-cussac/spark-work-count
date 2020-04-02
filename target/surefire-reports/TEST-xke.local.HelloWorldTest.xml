@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuite 
-errors="0" failures="0" hostname="Hitagi" name="xke.local.HelloWorldTest" tests="4" time="17.426" timestamp="2020-04-01T12:45:42">
+errors="0" failures="0" hostname="Hitagi" name="xke.local.HelloWorldTest" tests="5" time="18.082" timestamp="2020-04-02T10:58:32">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment">
     </property>
@@ -43,7 +43,7 @@ errors="0" failures="0" hostname="Hitagi" name="xke.local.HelloWorldTest" tests=
     <property name="os.name" value="Windows 10"/>
     <property name="sun.jnu.encoding" value="MS932"/>
     <property 
-    name="java.library.path" value="C:\Program Files\Java\jdk1.8.0_241\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\AdoptOpenJDK\jre-11.0.6.10-hotspot\bin;C:\Program Files (x86)\AdoptOpenJDK\jre-8.0.242.08-hotspot\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\dotnet\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Git\cmd;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\130\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\150\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\110\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\120\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\130\DTS\Binn\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Users\mouad\AppData\Local\Programs\Python\Python37-32\Scripts\;C:\Users\mouad\AppData\Local\Programs\Python\Python37-32\;C:\Users\mouad\AppData\Local\Microsoft\WindowsApps;;C:\Users\mouad\.dotnet\tools;C:\Users\mouad\AppData\Local\Microsoft\WindowsApps;C:\Users\mouad\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\mouad\AppData\Roaming\npm;.">
+    name="java.library.path" value="C:\Program Files\Java\jdk1.8.0_241\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\AdoptOpenJDK\jre-11.0.6.10-hotspot\bin;C:\Program Files (x86)\AdoptOpenJDK\jre-8.0.242.08-hotspot\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\dotnet\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Git\cmd;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\130\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\150\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\110\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\120\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\130\DTS\Binn\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\PuTTY\;C:\Users\mouad\AppData\Local\Programs\Python\Python37-32\Scripts\;C:\Users\mouad\AppData\Local\Programs\Python\Python37-32\;C:\Users\mouad\AppData\Local\Microsoft\WindowsApps;;C:\Users\mouad\.dotnet\tools;C:\Users\mouad\AppData\Local\Microsoft\WindowsApps;C:\Users\mouad\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\mouad\AppData\Roaming\npm;.">
 </property>
     <property 
     name="java.specification.name" value="Java Platform API Specification">
@@ -91,16 +91,19 @@ errors="0" failures="0" hostname="Hitagi" name="xke.local.HelloWorldTest" tests=
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
   <testcase 
-  name="je veux ajouter une colonne avec la moyenne des numéros département par région" classname="xke.local.HelloWorldTest" time="6.031">
+  name="je veux ajouter une colonne avec la moyenne des numéros département par région" classname="xke.local.HelloWorldTest" time="6.33">
 </testcase>
   <testcase 
-  name="je veux renommer la colonne des moyennes des numéros département" classname="xke.local.HelloWorldTest" time="2.444">
+  name="je veux renommer la colonne des moyennes des numéros département" classname="xke.local.HelloWorldTest" time="2.467">
 </testcase>
   <testcase 
-  name="je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet" classname="xke.local.HelloWorldTest" time="8.651">
+  name="je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet" classname="xke.local.HelloWorldTest" time="9.271">
 </testcase>
   <testcase 
-  name="join test" classname="xke.local.HelloWorldTest" time="0.289">
+  name="je veux vérifier que je les 0 soit supprimé" classname="xke.local.HelloWorldTest" time="0.002">
+</testcase>
+  <testcase 
+  name="je veux vérifier que le B soit supprimé" classname="xke.local.HelloWorldTest" time="0.0">
 </testcase>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
