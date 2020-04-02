@@ -71,7 +71,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     val actual = HelloWorld.convertInt(input)
 
     Then("j'ai bien mon Int")
-    assert(actual === expected)
+    actual shouldEqual expected
   }
 
   test("je veux Convertir '2A' en Int") {
