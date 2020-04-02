@@ -1,11 +1,12 @@
 package xke.local
 
 import org.apache.spark.sql._
+import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 
 object HelloWorld {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().getOrCreate()
+    val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate()
     import spark.implicits._
 
     // code
@@ -18,33 +19,58 @@ object HelloWorld {
 
     // main classique
     if (args.length == 0) {
-      val df = spark.read.option("header", true).csv("src/main/resources/departements-france.csv")
-        .withColumn("code_departement", col("code_departement").cast("integer"))
-
+      val dfDepts = getDFDepartments(spark)
+      val dfCities = getDFCities(spark)
+      val jointure = joinDeptsAndCities(dfDepts, dfCities)
       writeParquet(
         renameColumn(
-          avgDepByReg(df)
+          avgDepByReg(dfDepts)
         )
       )
     }
 
     // pour les tests
     else {
-      val df = spark.sparkContext.parallelize(List(
-        (1, 2, "toto"),
-        (1, 3, "toto"),
-        (1, 4, "toto"),
-        (2, 14, "zaza"),
-        (2, 54, "zaza"),
-        (2, 7, "zaza"),
-        (2, 5, "zaza")
-      )).toDF("code_region", "code_departement", "nom_region")
-      writeParquet(
-        renameColumn(
-          avgDepByReg(df)
-        )
-      )
+      mainTest(spark)
     }
+  }
+
+  def joinDeptsAndCities(dfDepts: DataFrame, dfCities: DataFrame): DataFrame = {
+    // jointure sur le code du département + on supp une des deux cononnes, inutile
+    dfDepts.join(dfCities,
+      dfDepts("code_departement") === dfCities("department_code"),
+      "left_outer"
+    )
+      .drop("department_code")
+  }
+
+  def getDFDepartments(spark: SparkSession): DataFrame = {
+    spark.read.option("header", true).csv("src/main/resources/departements-france.csv")
+      .withColumn("code_departement", extractDepInt(col("code_departement")))
+  }
+
+  def getDFCities(spark: SparkSession): DataFrame = {
+    spark.read.option("header", true).csv("src/main/resources/cities.csv")
+      .withColumn("department_code", extractDepInt(col("department_code")))
+  }
+
+  def mainTest(spark: SparkSession): Unit = {
+    import spark.implicits._
+    val df = List(
+      (1, 2, "toto"),
+      (1, 3, "toto"),
+      (1, 4, "toto"),
+      (2, 14, "zaza"),
+      (2, 54, "zaza"),
+      (2, 7, "zaza"),
+      (2, 5, "zaza")
+    ).toDF("code_region", "code_departement", "nom_region")
+      .withColumn("code_departement_int", extractDepInt(col("code_departement")))
+    writeParquet(
+      renameColumn(
+        avgDepByReg(df)
+      )
+    )
   }
 
   def avgDepByReg(df: DataFrame): DataFrame = {
@@ -63,7 +89,6 @@ object HelloWorld {
   //2) si votre String commence par un 0, on l'enlève
   //3) si votre String contient un caractère non numérique, on l'enlève
   //4) rédiger un test unitaire sur la fonction
-  def stringToInt(s: String): Int = {
-    if (s.startsWith("0") || !s.charAt(0).isDigit) s.substring(1).toInt else s.toInt
-  }
+  def stringToInt: String => Int = s => s.filter(Character.isDigit).toInt
+  val extractDepInt: UserDefinedFunction = udf(stringToInt)
 }
