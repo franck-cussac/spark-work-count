@@ -16,7 +16,17 @@ object HelloWorld {
       .withColumnRenamed("department_code", "code_departement")
     val join = joinWithUdf(df, dep_reg, "code_departement")
     join.show()
+
+    joinByPartition(join, "code_region", "code_departement", "overwrite", "src/main/parquet/ex2.parquet")
     // -- Exo2
+  }
+
+  def joinByPartition(df: DataFrame, col1: String, col2: String, mode: String, path: String): Unit = {
+    df
+      .write
+      .partitionBy(col1, col2)
+      .mode(mode)
+      .parquet(path)
   }
 
   def joinWithUdf(df: DataFrame, dep_reg: DataFrame, colName: String) = {
