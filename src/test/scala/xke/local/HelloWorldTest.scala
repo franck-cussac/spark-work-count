@@ -45,6 +45,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }
 
 /*  test("main must create a file with word count result") {
+
     Given("input filepath and output filepath")
     val input = "src/test/resources/input.txt"
     val output = "src/test/resources/output/v1/parquet"
@@ -75,7 +76,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     Given("le lancement de la méthode main")
     HelloWorld.main(null)
     When("je vérifie les différentes colonnes du parquet")
-    val df = spark.read.parquet("C:/Users/Bristouflex/Desktop/Projets/spark-work-count/src/main/resources/toto")
+    val df = spark.read.parquet("src/main/resources/toto")
     Then("les colonnes doivent être les même que dans le jeu de données de résultat")
     assert(df("avg_dep") != null && df("nom_region") != null && df("code_region") != null)
   }
