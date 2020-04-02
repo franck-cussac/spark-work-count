@@ -10,19 +10,32 @@ object HelloWorld {
 
     val parseToIntUdf: UserDefinedFunction = udf(parseToInt _)
 
-    val df = spark.read
+    val dfDepartments = spark.read
       .option("delimiter", ",")
       .option("header", true)
       .option("inferSchema", true)
       .csv("src/main/resources/departements-france.csv")
         .withColumn("code_departement", parseToIntUdf(col("code_departement")))
-    df.show()
+    dfDepartments.show()
 
-    val dfWithAvg = HelloWorld.avgDepByReg(df)
+    val dfCities = spark.read
+      .option("delemiter", ",")
+      .option("header", true)
+      .option("inferSchema", true)
+      .csv("src/main/resources/cities.csv")
+        .withColumn("department_code", parseToIntUdf(col("department_code")))
+    dfCities.show()
+
+    val dfWithAvg = HelloWorld.avgDepByReg(dfDepartments)
     dfWithAvg.show()
 
     val dfWithAvgAndName = HelloWorld.renameColumn(dfWithAvg, "avg_dep")
     dfWithAvgAndName.show()
+
+    val dfJoined = HelloWorld.joinDf(dfDepartments, dfCities)
+    dfJoined.show()
+
+    HelloWorld.writeParquet(dfJoined)
   }
 
   def parseToInt(s: String): Int =
@@ -34,4 +47,13 @@ object HelloWorld {
 
   def renameColumn(df: DataFrame, newName: String): DataFrame =
     df.withColumnRenamed("avg(code_departement)", newName)
+
+  def joinDf(dfDepartements: DataFrame, dfCities: DataFrame): DataFrame =
+    dfDepartements.join(dfCities, dfDepartements("code_departement") === dfCities("department_code"), "left_outer")
+    .drop("department_code")
+
+  def writeParquet(df: DataFrame): Unit =
+    df.write.partitionBy("code_region", "code_departement")
+      .mode("overwrite")
+      .parquet("src/main/parquets/file.parquet")
 }

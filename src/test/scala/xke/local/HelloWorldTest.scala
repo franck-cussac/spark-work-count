@@ -87,4 +87,40 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assert(actual === expected)
   }
 
+  test("Je veux faire la jointure entre les départements et les villes") {
+    Given("")
+    val inputDepartements = List(
+      (1, 2, "toto"),
+      (1, 3, "toto"),
+      (1, 4, "toto"),
+      (2, 15, "tata"),
+      (2, 16, "tata"),
+      (2, 17, "tata"),
+      (2, 18, "tata")
+    ).toDF("code_region", "code_departement", "nom_region")
+
+    val inputCities = List(
+      (2, "Nantes"),
+      (15, "Reims"),
+      (16, "Charleville"),
+      (17, "Sedan")
+    ).toDF("department_code", "name")
+
+    val expected = List(
+      (2, "Nantes", 1, "toto"),
+      (3, null, 1, "toto"),
+      (4, null, 1, "toto"),
+      (15, "Reims", 2, "tata"),
+      (16, "Charleville", 2, "tata"),
+      (17, "Sedan", 2, "tata"),
+      (18, null, 2, "tata")
+    ).toDF("code_departement", "name", "code_region", "nom_region")
+
+    When("")
+    val actual = HelloWorld.joinDf(inputDepartements, inputCities)
+
+    Then("")
+    assertDataFrameEquals(actual, expected)
+  }
+
 }
