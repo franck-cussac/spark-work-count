@@ -7,6 +7,42 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   val spark = SharedSparkSession.sparkSession
   import spark.implicits._
 
+  test("je veux récuperer les df des departments") {
+    Given("les colonnes du fichier departements-france.csv")
+    val expected = Array(
+      "code_departement",
+      "nom_departement",
+      "code_region",
+      "nom_region"
+    ).toSet
+
+    When("Je lit le fichier et recup la DataFrame")
+    val actual = HelloWorld.getDepartmentDF().schema.fieldNames.toSet
+
+    Then("j'ai bien récup ma Dataframe Departement")
+    actual shouldEqual expected
+  }
+
+  test("je veux récuperer les df des villes") {
+    Given("les colonnes du fichier cities.csv")
+    val expected = Array(
+      "id",
+      "department_code",
+      "insee_code",
+      "zip_code",
+      "name",
+      "slug",
+      "gps_lat",
+      "gps_lng"
+    ).toSet
+
+    When("Je lit le fichier et recup la DataFrame")
+    val actual = HelloWorld.getCitiesDF().schema.fieldNames.toSet
+
+    Then("j'ai bien récup ma Dataframe Cities")
+    actual shouldEqual expected
+  }
+
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
     Given("une dataframe avec au moins 3 colonnes : nom région, code departement et nom region")
     val input = spark.sparkContext.parallelize(List(
@@ -55,7 +91,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     When("Je lance le programme")
     HelloWorld.main(null)
-    val actual = spark.read.parquet("src/main/resources/output.parquet").schema.fieldNames.toSet
+    val actual = spark.read.parquet("src/main/resources/parquet_dept/output.parquet").schema.fieldNames.toSet
 
     Then("J'ai mon paquet")
     columns shouldEqual actual
@@ -97,5 +133,4 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     Then("j'ai bien mon Int")
     assert(actual === expected)
   }
-
 }

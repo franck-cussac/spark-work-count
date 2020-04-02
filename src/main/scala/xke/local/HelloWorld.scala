@@ -11,7 +11,8 @@ object HelloWorld {
   val app_master = "local[*]"
   val url_department_file = "src/main/resources/departements-france.csv"
   val url_cities_file = "src/main/resources/cities.csv"
-  val url_parquet_folder = "src/main/resources/output.parquet"
+  val url_parquet_dept_folder = "src/main/resources/parquet_dept/output.parquet"
+  val url_parquet_city_folder = "src/main/resources/parquet_city/output.parquet"
   val colname_code_department = "code_departement"
   val colname_department_code = "department_code"
   val colname_code_region = "code_region"
@@ -27,17 +28,19 @@ object HelloWorld {
   def main(args: Array[String]): Unit = {
 
     val dfd = getDepartmentDF()
+    val dfd_avg = avgDepByReg(dfd)
+    val dfd_renamed = renameColumn(dfd_avg, "avg(code_departement)", "avg_dep")
+    dfd_renamed.show
+    dfd_renamed.write.mode("overwrite").parquet(url_parquet_dept_folder)
+
     val dfc = getCitiesDF()
     val df_join = dfd.join(
       dfc,
       dfd(colname_code_department) === dfc(colname_department_code),
       "left_outer"
     )
-
-    val dfd_avg = avgDepByReg(df_join)
-    val dfd_renamed = renameColumn(dfd_avg, "avg(code_departement)", "avg_dep")
     dfd_renamed.show
-    dfd_renamed.write.mode("overwrite").parquet(url_parquet_folder)
+    dfd_renamed.write.mode("overwrite").parquet(url_parquet_city_folder)
   }
 
   /**
