@@ -34,7 +34,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(actually, expected)
   }*/
 
-  test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
+  /*test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
     Given("Un dataframe avec une région et deux département pour une moyenne")
 
     val input = spark.sparkContext.parallelize(
@@ -104,6 +104,33 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     Then("result")
     assertDataFrameEquals(main, expected)
+  }*/
+
+
+  test("je veux verifier que mon string est bien transformé en int") {
+    Given("a string")
+    val str = "1"
+    When("I call the function")
+    val res = HelloWorld.stringToInt(str)
+    Then("I check typeof")
+    assert(res.isInstanceOf[Int])
   }
 
+  test("je veux verifier que le zéro au début est bien retiré") {
+    Given("a string")
+    val str = "001"
+    When("I call the function")
+    val res = HelloWorld.stringToInt(str)
+    Then("I check typeof")
+    assert(res === 1)
+  }
+
+  test("je veux verifier que les caractères sont bien retirés") {
+    Given("a string")
+    val str = "01A"
+    When("I call the function")
+    val res = HelloWorld.stringToInt(str)
+    Then("I check typeof")
+    assert(res === 1)
+  }
 }

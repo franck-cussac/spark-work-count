@@ -12,15 +12,10 @@ object HelloWorld {
     val rename = renameColumn(avg)
     rename.show()
     writeToParquet(rename)
+  }
 
-    // code
-    // src/main/resources/departements-france.csv
-    // 1) lire le fichier
-    // 2) créer une colonne avec la moyenne des numéro département par code région
-    //    code_region, avg_dep, nom_region
-    // 3) renommer la colonne moyenne des départements en avg_dep
-    // 4) écrire le fichier en parquet
-
+  def stringToInt(input: String): Int = {
+    input.filter(Character.isDigit).toInt
   }
 
   def avgDepByReg(input: DataFrame): DataFrame = {
