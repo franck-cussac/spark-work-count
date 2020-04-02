@@ -98,4 +98,28 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
         Then("Meme DataFrame")
         assertDataFrameEquals(parquet, df)
     }
+
+    test("je teste removeZeroAndToInt avec 06") {
+        val input = "06"
+        val expected = 6
+        val actual = HelloWorld._removeZeroAndToInt(input)
+
+        actual.shouldEqual(expected)
+    }
+
+    test("je teste removeZeroAndToInt avec 2A") {
+        val input = "2A"
+        val expected = 2
+        val actual = HelloWorld._removeZeroAndToInt(input)
+
+        actual.shouldEqual(expected)
+    }
+
+    test("je teste removeZeroAndToInt avec 2B") {
+        val input = "2B"
+        val expected = 2
+        val actual = HelloWorld._removeZeroAndToInt(input)
+
+        actual.shouldEqual(expected)
+    }
 }
