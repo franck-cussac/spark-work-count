@@ -16,8 +16,9 @@ object HelloWorld {
     // 3) renommer la colonne moyenne des départements en avg_dep
     // 4) écrire le fichier en parquet
 
+
     // 1
-    val df = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")
+    val df = fetchDepartements
 
     // 2
     val dfAvg = avgDepByReg(df)
@@ -30,6 +31,16 @@ object HelloWorld {
 
     // Display
     dfRename.show
+
+
+
+//    1) utiliser List().toDF() pour créer vos dataframe d'input
+//    2) assurez vous que toutes vos fonctions ont des tests
+//    3) terminez bien votre main en ajoutant l'UDF développé ce matin
+//      4) pensez à pull la branche master, j'ai corrigé la création du jar
+//      5) pour ceux qui peuvent en local, réessayez de lancer un spark-submit avec --master spark://spark-master:7077 depuis le conteneur worker
+//    Pour les autres, on verra peut être cet après-midi
+
   }
 
   val convertStringToIntUDF: UserDefinedFunction = udf(convertStringToInt _)
@@ -40,11 +51,10 @@ object HelloWorld {
 
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
-    dataFrame.withColumn("code_departement", dataFrame.col("code_departement")
-      .cast("Float"))
+    dataFrame.withColumn("code_departement", convertStringToIntUDF(dataFrame.col("code_departement")))
       .groupBy(col("code_region"))
       .agg(avg("code_departement").as("avg_departement"),
-           first("nom_region").as("nom_region"))
+        first("nom_region").as("nom_region"))
   }
 
   def renameColumn(dataFrame: DataFrame, theOldName: String, theNewName: String): DataFrame = {
