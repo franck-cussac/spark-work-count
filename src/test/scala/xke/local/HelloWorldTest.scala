@@ -94,5 +94,19 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }
 
 
+  test("Je récupère que les chiffres et je supprime les lettres") {
+
+    Given("J'ai une chaine de caractère avec 2 chiffre: 1 et 5")
+    val s = "1jgfmkk5"
+    val expected = 15
+
+    When("Je supprime les lettres")
+    val actual = HelloWorld.parseInteger(s)
+
+    Then("Le nombre de colonne devrait être 15")
+    assert(actual === expected)
+  }
+
+
 
 }
