@@ -23,13 +23,11 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.version}</artifactId>
             <version>${spark.version}</version>
-            <!--<scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_${scala.version}</artifactId>
             <version>${spark.version}</version>
-            <!--<scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
@@ -104,6 +102,16 @@
                             </transformers>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>shaded</shadedClassifierName>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>

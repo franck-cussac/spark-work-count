@@ -1,25 +1,25 @@
 Discovery starting.
-Discovery completed in 2 seconds, 864 milliseconds.
+Discovery completed in 2 seconds, 813 milliseconds.
 Run starting. Expected test count is: 7
 HelloWorldTest:
-- je veux ajouter une colonne avec la moyenne des num?ros d?partement par r?gion (6 seconds, 400 milliseconds)
+- je veux ajouter une colonne avec la moyenne des num?ros d?partement par r?gion (6 seconds, 163 milliseconds)
   + Given dataframe avec 3 colonnes : nom r?gion, code r?gion, num?ro d?partement 
   + When calcule average 
   + Then return ok 
-- je veux renommer la colonne des moyennes des num?ros d?partement (2 seconds, 474 milliseconds)
+- je veux renommer la colonne des moyennes des num?ros d?partement (2 seconds, 481 milliseconds)
   + Given dataframe avec 3 colonnes : nom r?gion, code r?gion, moyenne des d?partements 
   + When rename column 
   + Then column renamed 
-- je veux v?rifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet (8 seconds, 148 milliseconds)
+- je veux v?rifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet (8 seconds, 676 milliseconds)
   + When calcule average 
-- je veux v?rifier que je les 0 soit supprim? (1 millisecond)
-- je veux v?rifier que le B soit supprim? (1 millisecond)
-- je veux v?rifier que la jointure est bonne (4 seconds, 292 milliseconds)
+- je veux v?rifier que je les 0 soit supprim? (2 milliseconds)
+- je veux v?rifier que le B soit supprim? (0 milliseconds)
+- je veux v?rifier que la jointure est bonne (4 seconds, 502 milliseconds)
   + When joinin cities / departments / regions 
-- je veux v?rifier que la partition du fichier soit bonne (462 milliseconds)
+- je veux v?rifier que la partition du fichier soit bonne (552 milliseconds)
   + Given dataframe avec 3 colonnes : nom r?gion, code r?gion, moyenne des d?partements 
   + When partitionning city department and region 
-Run completed in 24 seconds, 677 milliseconds.
+Run completed in 25 seconds, 220 milliseconds.
 Total number of tests run: 7
 Suites: completed 2, aborted 0
 Tests: succeeded 7, failed 0, canceled 0, ignored 0, pending 0

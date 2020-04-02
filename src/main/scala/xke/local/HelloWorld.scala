@@ -22,7 +22,7 @@ object HelloWorld {
 
   //spark://spark-master:7077
     //.master("local[*]").appName("test")
-    val spark = SparkSession.builder().getOrCreate()
+    val spark = SparkSession.builder().master("local[*]").appName("test").getOrCreate()
     import spark.implicits._
 
     val df = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")
@@ -40,8 +40,10 @@ object HelloWorld {
   }
 
   def secondCSV(dfVille: DataFrame, dfDepartments: DataFrame, dfRegions: DataFrame): DataFrame= {
-    val joinedDf = dfVille.join(dfDepartments, dfVille.col("department_code")===dfDepartments.col("department_code")).drop(dfDepartments.col("department_code"))
-    val finalDF = joinedDf.join(dfRegions, joinedDf.col("region_code")===dfRegions.col("region_code")).drop(dfRegions.col("region_code"))
+    val renamedDep = renameColumn(dfDepartments,"name","name_dep")
+    val renamedRegion = renameColumn(dfRegions,"name", "name_reg")
+    val joinedDf = dfVille.join(renamedDep, dfVille.col("department_code")===renamedDep.col("department_code")).drop(renamedDep.col("department_code")).drop(renamedDep.col("slug")).drop(renamedDep.col("id"))
+    val finalDF = joinedDf.join(renamedRegion, joinedDf.col("region_code")===renamedRegion.col("region_code")).drop(renamedRegion.col("region_code")).drop(renamedRegion.col("slug")).drop(renamedRegion.col("id"))
     val cleanedFinalDF = cleanDep(finalDF, "department_code")
     return cleanedFinalDF
 

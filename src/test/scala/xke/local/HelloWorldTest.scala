@@ -166,25 +166,25 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     val inputDepartement = spark.sparkContext.parallelize(
       List(
-        (1 , 1, "Hauts-de-Seine", 1),
-        (2 , 2, "Val d'oise", 2)
+        (1 , 1, "Hauts-de-Seine", 1, "o"),
+        (2 , 2, "Val d'oise", 2, "o")
       )
-    ).toDF("id_dep", "department_code", "nom_departement", "region_code")
+    ).toDF("id", "department_code", "nom_departement", "region_code", "slug")
 
     val inputRegion = spark.sparkContext.parallelize(
       List(
-        (1 , 1, "Ile de France"),
-        (2 , 2, "Rhone Alpes")
+        (1 , 1, "Ile de France", "o"),
+        (2 , 2, "Rhone Alpes", "o")
       )
-    ).toDF("id_reg", "region_code", "nom_region")
+    ).toDF("id", "region_code", "nom_region", "slug")
 
     val expected = spark.sparkContext.parallelize(
       List(
-        (1 , 1000, "Suresnes", 1,1,  "Hauts-de-Seine", 1, 1 ,  "Ile de France"),
-        (2 , 2000, "Puteaux", 1, 1, "Hauts-de-Seine", 1, 1 ,  "Ile de France"),
-        (3 , 3000, "Nanterre", 2, 2, "Val d'oise", 2, 2 ,  "Rhone Alpes")
+        (1 , 1000, "Suresnes", 1,  "Hauts-de-Seine", 1,  "Ile de France"),
+        (2 , 2000, "Puteaux", 1,  "Hauts-de-Seine", 1,  "Ile de France"),
+        (3 , 3000, "Nanterre", 2,  "Val d'oise", 2,  "Rhone Alpes")
       )
-    ).toDF("id", "habitant", "nom","department_code","id_dep" ,"nom_departement","region_code" , "id_reg","nom_region")
+    ).toDF("id", "habitant", "nom","department_code","nom_departement","region_code","nom_region")
 
     When("joinin cities / departments / regions")
 
