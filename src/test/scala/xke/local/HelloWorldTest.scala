@@ -75,4 +75,16 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(outputDf, expectedDf)
   }
 
+  test("Je veux vérifier que la colonne code_departement soit en integer (suppression des 0 et des lettres)") {
+    Given("")
+    val s = "0azerty78A"
+    val expected = 78
+
+    When("")
+    val actual = HelloWorld.parseToInt(s)
+
+    Then("")
+    assert(actual === expected)
+  }
+
 }
