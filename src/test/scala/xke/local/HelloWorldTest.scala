@@ -1,5 +1,6 @@
 package xke.local
 
+import org.apache.spark.sql.catalyst.expressions.AssertTrue
 import org.scalatest.{FunSuite, GivenWhenThen}
 import spark.{DataFrameAssertions, SharedSparkSession}
 
@@ -41,19 +42,122 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
    ).toDF("code_region","nom_region", "avg(code_departement)")
     When("J'utilse la fonction de rennomage")
       val actual = HelloWorld.renameColumn(input)
-
+      actual.show()
     Then("")
     assertDataFrameEquals(actual, expected)
   }
 
-  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
-    Given("Je dois lire le fichier")
-    val input = "src/main/resources/departements-france.csv"
+  test("Quand je reçoit un nombre qui commence par 0, je renvoie Neal") {
+    Given("J'ai un nombre commançant par 0")
+    val input = "02"
+    val expected = None;
+    When("Je le filtre")
+    val actual = HelloWorld.stringToInt(input)
 
-    When("Je lis le fichier")
-    HelloWorld.main(input)
+    Then("Il a disparu")
+    assert(expected == actual)
 
-    Then("J'ai lu le fichier")
   }
 
+  test("Quand je reçoit un nombre , je renvoie Neal") {
+    Given("J'ai un nombre")
+    val input = "2"
+    val expected = Some(2);
+    When("Je le filtre")
+    val actual = HelloWorld.stringToInt(input)
+
+    Then("Il change de format")
+    assert(expected == actual)
+
+  }
+
+  test("Quand je reçoit un nombre qui contient une lettre, je renvoie Neal") {
+    Given("J'ai un nombre avec un lettre")
+    val input = "2B"
+    val expected = None;
+    When("Je le filtre")
+    val actual = HelloWorld.stringToInt(input)
+
+    Then("Il n'est plus là")
+    assert(expected == actual)
+
+  }
+  test("Mes 3 datasets doivent être fusionner") {
+    Given("J'ai 3 DataFrames")
+    val villes =
+      List(
+        ("974","97480","Saint-Joseph")
+      ).toDF(
+        "department_code","zip_code","name"
+      )
+
+    val departements =
+      List(
+        ("04","974","La Réunion")
+      ).toDF(
+        "region_code","code","name"
+      )
+
+    val regions =
+      List(
+        ("04","La Réunion")
+      ).toDF(
+        "code","name"
+      )
+    val expected =
+      List(
+        (
+        "974"
+        ,"97480"
+        ,"Saint-Joseph"
+        ,"04"
+        ,"La Réunion"
+        ,"La Réunion")
+      ).toDF(
+        "department_code"
+        ,"zip_code"
+        ,"city_name"
+        ,"region_code"
+        ,"departement_name"
+        ,"region_name"
+      )
+
+    When("Je les joins")
+    val actual = HelloWorld.joinLocations(villes,departements,regions)
+
+    Then("J'ai un seul DF complet")
+
+    assertDataFrameEquals(actual,expected)
+
+  }
+
+  test("Quand je reçoit un nombre qui contient une lettre, je renvoie Neal") {
+    Given("J'ai un nombre avec un lettre")
+    val path = "src/main/resources/departements-france-out.parquet"
+    val input =
+      List(
+        (
+          "974"
+          ,"97480"
+          ,"Saint-Joseph"
+          ,"04"
+          ,"La Réunion"
+          ,"La Réunion")
+      ).toDF(
+        "department_code"
+        ,"zip_code"
+        ,"city_name"
+        ,"region_code"
+        ,"departement_name"
+        ,"region_name"
+      )
+
+    When("Je le filtre")
+    HelloWorld.writeLocations(input,path)
+    val actual = spark.read.parquet(path)
+    actual.show()
+    Then("Il n'est plus là")
+    //assert(expected == actual)
+
+  }
 }

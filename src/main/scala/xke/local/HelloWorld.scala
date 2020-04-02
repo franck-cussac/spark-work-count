@@ -1,12 +1,15 @@
 package xke.local
 
+import org.apache.avro.generic.GenericData.StringType
+import org.apache.commons.lang.ObjectUtils.Null
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
-object HelloWorld {
-  def main(input: String): Unit = {
-    val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate()
 
+object HelloWorld {
+  def main(args: Array[String]): Unit = {
+    val spark = SparkSession.builder().getOrCreate()
+    val input = args(0)
     // code
     // src/main/resources/departements-france.csv
     // 1) lire le fichier
@@ -21,11 +24,36 @@ object HelloWorld {
   }
 
   def avgDepByReg(df: DataFrame)  = {
-    df.withColumn("code_departement", col("code_departement").cast("Integer"))
+    df.withColumn("code_departement", stringToIntUdf(col("code_departement")))
       .groupBy(df("code_region"),df("nom_region"))
       .avg("code_departement")
   }
   def renameColumn(df: DataFrame): DataFrame = {
     df.withColumnRenamed("avg(code_departement)","avg_dep")
   }
+
+  def stringToInt(input: String)  = input match {
+    case x if x.startsWith("0")  => None
+    case x if x.contains('A')=> None
+    case x if x.contains('B')=> None
+    case _  => Some(input.toInt);
+  }
+
+  val stringToIntUdf = udf( (x: String) => stringToInt(x))
+
+  def joinLocations(villes: DataFrame, departements: DataFrame, regions: DataFrame): DataFrame = {
+    villes
+      .withColumnRenamed("name","city_name")
+      .join(departements).where(col("department_code")=== col("code"))
+      .withColumnRenamed("name","departement_name")
+      .drop(col("code"))
+      .join(regions).where(col("region_code")=== col("code"))
+      .withColumnRenamed("name","region_name")
+      .drop(col("code"))
+  }
+
+  def writeLocations(locations: DataFrame, output: String) = {
+    locations.write.mode("append").partitionBy("region_code","departement_code").parquet(output)
+  }
+
 }
