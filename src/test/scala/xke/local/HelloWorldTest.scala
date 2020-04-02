@@ -97,8 +97,30 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
 
     assertDataFrameEquals(actually, expected)
+  }
 
+  test("je veux vérifier que je nettoie bien mes code departement"){
+    val input = spark.sparkContext.parallelize(
+      List(
+        ("02" , 2, "Hauts-de-France"),
+        ("32" , 2, "Hauts-de-France"),
+        ("2a" , 2, "Hauts-de-France"),
+        ( "30" , 50, "Aquitaine")
+      )
+    ).toDF("code_departement", "avg(code_departement)", "nom_region")
 
+    val actually = HelloWorld.cleanDf(input)
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        (2, 2, "Hauts-de-France"),
+        (32, 2, "Hauts-de-France"),
+        (2, 2, "Hauts-de-France"),
+        (30, 50, "Aquitaine")
+      )
+    ).toDF("code_departement", "avg(code_departement)", "nom_region")
+
+    assertDataFrameEquals(actually, expected)
   }
 
 }

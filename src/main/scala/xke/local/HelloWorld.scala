@@ -16,13 +16,15 @@ object HelloWorld {
     // 4) écrire le fichier en parquet
 
     val df = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")
-    val avg = avgDepByReg(df)
+    val dfClean = cleanDf(df)
+    dfClean.show()
+    /*val avg = avgDepByReg(df)
     avg.show
 
     val renamed = renameColumn(avg, "avg_dep", "avg_departement")
     renamed.show
 
-    renamed.write.mode("overwrite").parquet("src/main/data/region/")
+    renamed.write.mode("overwrite").parquet("src/main/data/region/")*/
   }
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
@@ -34,5 +36,19 @@ object HelloWorld {
 
   def renameColumn(dataFrame: DataFrame, newName: String, oldName: String): DataFrame = {
     dataFrame.withColumnRenamed(oldName, newName)
+  }
+
+  def cleanDf(dataFrame: DataFrame): DataFrame = {
+    val stringAdapter = (s: String) => {
+      val Pattern = "0".r
+
+      s.replaceAll("[^\\d.]", "") match {
+        case Pattern(c) => c.charAt(1).toInt
+        case c => c.toInt
+      }
+    }
+
+    val stringUdf = udf(stringAdapter)
+    dataFrame.withColumn("code_departement", stringUdf(col("code_departement")) as "code_departement")
   }
 }
