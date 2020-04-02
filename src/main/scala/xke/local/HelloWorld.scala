@@ -1,6 +1,7 @@
 package xke.local
 
 import org.apache.spark.sql._
+import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 
 
@@ -10,6 +11,7 @@ object HelloWorld {
       .appName("test")
       //.master("local[*]")
       .getOrCreate()
+    import org.apache.spark.sql.functions.udf
     import spark.implicits._
 
 
@@ -38,4 +40,26 @@ object HelloWorld {
   def renameColumn(df : DataFrame, oldName : String, newName : String): DataFrame = {
     df.withColumnRenamed(oldName, newName)
   }
+
+  val toInteger: UserDefinedFunction = udf(convertInt _)
+
+  def convertInt(s: String) : Int = {
+    if(s.startsWith("0")) {
+      s.substring(1).toInt
+    }
+    if(s.endsWith("A") || s.endsWith("B")){
+      s.substring(0,s.length-1).toInt
+    } else{
+      s.toInt
+    }
+  }
+/*
+  def title(s: String): Int = s match {
+    case s.head == '0' => s.substring(1).toInt
+    case s.last == 'A' => s.substring(1).toInt
+    case s.last == 'B' => s.substring(1).toInt
+    case _ => s.toInt
+  }*/
+
+
 }
