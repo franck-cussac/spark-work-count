@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuite 
-errors="0" failures="0" hostname="Hitagi" name="xke.local.HelloWorldTest" tests="5" time="18.082" timestamp="2020-04-02T10:58:32">
+errors="0" failures="0" hostname="Hitagi" name="xke.local.HelloWorldTest" tests="7" time="21.794" timestamp="2020-04-02T17:01:50">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment">
     </property>
@@ -91,19 +91,25 @@ errors="0" failures="0" hostname="Hitagi" name="xke.local.HelloWorldTest" tests=
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
   <testcase 
-  name="je veux ajouter une colonne avec la moyenne des numéros département par région" classname="xke.local.HelloWorldTest" time="6.33">
+  name="je veux ajouter une colonne avec la moyenne des numéros département par région" classname="xke.local.HelloWorldTest" time="6.402">
 </testcase>
   <testcase 
-  name="je veux renommer la colonne des moyennes des numéros département" classname="xke.local.HelloWorldTest" time="2.467">
+  name="je veux renommer la colonne des moyennes des numéros département" classname="xke.local.HelloWorldTest" time="2.474">
 </testcase>
   <testcase 
-  name="je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet" classname="xke.local.HelloWorldTest" time="9.271">
+  name="je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet" classname="xke.local.HelloWorldTest" time="8.149">
 </testcase>
   <testcase 
-  name="je veux vérifier que je les 0 soit supprimé" classname="xke.local.HelloWorldTest" time="0.002">
+  name="je veux vérifier que je les 0 soit supprimé" classname="xke.local.HelloWorldTest" time="0.001">
 </testcase>
   <testcase 
-  name="je veux vérifier que le B soit supprimé" classname="xke.local.HelloWorldTest" time="0.0">
+  name="je veux vérifier que le B soit supprimé" classname="xke.local.HelloWorldTest" time="0.001">
+</testcase>
+  <testcase 
+  name="je veux vérifier que la jointure est bonne" classname="xke.local.HelloWorldTest" time="4.293">
+</testcase>
+  <testcase 
+  name="je veux vérifier que la partition du fichier soit bonne" classname="xke.local.HelloWorldTest" time="0.462">
 </testcase>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

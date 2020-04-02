@@ -85,7 +85,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     ).toDF("code_region", "avg_dep", "nom_region")
 
     When("rename column")
-    val actual = HelloWorld.renameColumn(input)
+    val actual = HelloWorld.renameColumn(input,"avg(code_departement)", "avg_dep")
 
     Then("column renamed")
     assertDataFrameEquals(actual, expected)
@@ -106,7 +106,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     val output = "src/test/resources/output/test3.parquet"
 
     When("calcule average")
-    HelloWorld.writeToParquet(HelloWorld.renameColumn(HelloWorld.avgDepByReg(df)), output)
+    HelloWorld.firstCSV(df, output)
 
     val actually = spark.sqlContext.read.parquet(output)
 
@@ -154,6 +154,63 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assert(actually == expected)
   }
 
+  test("je veux vérifier que la jointure est bonne") {
 
+    val inputVille = spark.sparkContext.parallelize(
+      List(
+        (1 , 1000, "Suresnes", 1),
+        (2 , 2000, "Puteaux", 1),
+        (3 , 3000, "Nanterre", 2)
+      )
+    ).toDF("id", "habitant", "nom", "department_code")
+
+    val inputDepartement = spark.sparkContext.parallelize(
+      List(
+        (1 , 1, "Hauts-de-Seine", 1),
+        (2 , 2, "Val d'oise", 2)
+      )
+    ).toDF("id_dep", "department_code", "nom_departement", "region_code")
+
+    val inputRegion = spark.sparkContext.parallelize(
+      List(
+        (1 , 1, "Ile de France"),
+        (2 , 2, "Rhone Alpes")
+      )
+    ).toDF("id_reg", "region_code", "nom_region")
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        (1 , 1000, "Suresnes", 1,1,  "Hauts-de-Seine", 1, 1 ,  "Ile de France"),
+        (2 , 2000, "Puteaux", 1, 1, "Hauts-de-Seine", 1, 1 ,  "Ile de France"),
+        (3 , 3000, "Nanterre", 2, 2, "Val d'oise", 2, 2 ,  "Rhone Alpes")
+      )
+    ).toDF("id", "habitant", "nom","department_code","id_dep" ,"nom_departement","region_code" , "id_reg","nom_region")
+
+    When("joinin cities / departments / regions")
+
+    val actually = HelloWorld.secondCSV(inputVille, inputDepartement, inputRegion)
+
+    assertDataFrameEquals(actually, expected)
+  }
+
+  test("je veux vérifier que la partition du fichier soit bonne"){
+    Given("dataframe avec 3 colonnes : nom région, code région, moyenne des départements")
+    val input = spark.sparkContext.parallelize(
+      List(
+        (1 , 1000, "Suresnes", 1,1,  "Hauts-de-Seine", 1, 1 ,  "Ile de France"),
+        (2 , 2000, "Puteaux", 1, 1, "Hauts-de-Seine", 1, 1 ,  "Ile de France"),
+        (3 , 3000, "Nanterre", 2, 2, "Val d'oise", 2, 2 ,  "Rhone Alpes")
+      )
+    ).toDF("id", "habitant", "nom","department_code","id_dep" ,"nom_departement","region_code" , "id_reg","nom_region")
+
+    val output = "src/test/resources/output/join/"
+    val sub_output = "src/test/resources/output/join/region_code=1"
+
+    When("partitionning city department and region")
+    HelloWorld.partitionParquet(input, output)
+    val actually = spark.sqlContext.read.parquet(sub_output)
+
+    assert(actually.count() === 2 )
+  }
 
 }
