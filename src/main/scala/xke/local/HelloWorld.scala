@@ -16,39 +16,43 @@ object HelloWorld {
     // 3) renommer la colonne moyenne des départements en avg_dep
     // 4) écrire le fichier en parquet
 
-    // 1
-    val df = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")
+    // Get Departements and Cities
+    val dfDepartements = fetchDepartements(spark)
+    val dfCities = fetchCities(spark)
 
-    // 2
-    val dfAvg = avgDepByReg(df)
+    // Apply avg
+    val dfAvg = avgDepByReg(dfDepartements)
 
-    // 3
     val dfRename = renameColumn(dfAvg, "avg_departement", "avg_dep")
 
-    // 4
-    write(dfRename, "src/main/resources/file.parquet")
+    writeDepartementInParquet(dfRename)
 
     // Display
     dfRename.show
 
 
-
 //    1) utiliser List().toDF() pour créer vos dataframe d'input
 //    2) assurez vous que toutes vos fonctions ont des tests
 //    3) terminez bien votre main en ajoutant l'UDF développé ce matin
-//      4) pensez à pull la branche master, j'ai corrigé la création du jar
-//      5) pour ceux qui peuvent en local, réessayez de lancer un spark-submit avec --master spark://spark-master:7077 depuis le conteneur worker
+//    4) pensez à pull la branche master, j'ai corrigé la création du jar
+//    5) pour ceux qui peuvent en local, réessayez de lancer un spark-submit avec --master spark://spark-master:7077 depuis le conteneur worker
 //    Pour les autres, on verra peut être cet après-midi
 
+    val join = mergeDepartementsAndCities(dfDepartements, dfCities)
 
+    join.show
+
+    writeParquetByRegionAndDept(join)
   }
 
-  val convertStringToIntUDF: UserDefinedFunction = udf(convertStringToInt _)
-
-  def convertStringToInt(value: String): Int = {
-    value.filter(Character.isDigit).toInt
+  def fetchDepartements(sparkSession: SparkSession): DataFrame = {
+    sparkSession.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")
   }
 
+  def fetchCities(sparkSession: SparkSession): DataFrame = {
+    sparkSession.read.option("sep", ",").option("header", true).csv("src/main/resources/cities.csv")
+      .withColumn("department_code", convertStringToIntUDF(col("department_code")))
+  }
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
     dataFrame.withColumn("code_departement", convertStringToIntUDF(dataFrame.col("code_departement")))
@@ -57,14 +61,32 @@ object HelloWorld {
         first("nom_region").as("nom_region"))
   }
 
+  val convertStringToIntUDF: UserDefinedFunction = udf(convertStringToInt _)
+
+  def convertStringToInt(value: String): Int = {
+    value.filter(Character.isDigit).toInt
+  }
+
+  def mergeDepartementsAndCities(dfDepts: DataFrame, dfCities: DataFrame): DataFrame = {
+    dfDepts.join(dfCities, dfDepts("code_departement") === dfCities("department_code"), "left_outer")
+      .drop("department_code")
+  }
+
   def renameColumn(dataFrame: DataFrame, theOldName: String, theNewName: String): DataFrame = {
     dataFrame.withColumnRenamed(theOldName, theNewName)
   }
 
-  def write(dataFrame: DataFrame, path: String) = {
+  def writeDepartementInParquet(dataFrame: DataFrame): Unit = {
     dataFrame.write
       .mode("overwrite")
-      .parquet(path)
+      .parquet("src/main/resources/file.parquet")
+  }
+
+  def writeParquetByRegionAndDept(dataFrame: DataFrame): Unit = {
+    dataFrame.write
+      .partitionBy("code_region", "code_departement")
+      .mode("overwrite")
+      .parquet("src/main/resources/code_region-code_departement.parquet")
   }
 
 }
