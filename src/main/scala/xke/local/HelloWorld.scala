@@ -1,6 +1,7 @@
 package xke.local
 
 import org.apache.spark.sql._
+import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 
 object HelloWorld {
@@ -23,6 +24,10 @@ object HelloWorld {
 
   }
 
+  def stringToInt(str: String): Int = {
+    str.filter(Character.isDigit).toInt
+  }
+
   def createDateFrame(sparkSession: SparkSession): DataFrame = {
     sparkSession.read.option("header", true).csv("src/main/resources/departements-france.csv")
   }
@@ -35,4 +40,7 @@ object HelloWorld {
   def renameColumn(dataFrame: DataFrame): DataFrame = {
     dataFrame.withColumnRenamed("avg(code_departement)", "avg_dep")
   }
+
+  val stringToIntUdf: UserDefinedFunction = udf(stringToInt _ )
+
 }

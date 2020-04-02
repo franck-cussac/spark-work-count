@@ -99,4 +99,13 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
   }
 
+  test("Je veut convertir une chaine de caractère en nombre") {
+    Given("Une chaine de caractère composée de chiffre et de lettres")
+    val input = "045d45"
+    When("Quand jexécute la fonction")
+    val expected = "4545"
+    val actual = HelloWorld.stringToInt(input)
+    Then("J'ai le résultat attendu")
+    assert(actual === expected)
+  }
 }
