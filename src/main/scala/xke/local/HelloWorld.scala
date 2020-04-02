@@ -16,15 +16,13 @@ object HelloWorld {
     // 4) écrire le fichier en parquet
 
     val df = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")
-    val dfClean = cleanDf(df)
-    dfClean.show()
-    /*val avg = avgDepByReg(df)
-    avg.show
+    firstWork(df).show
 
-    val renamed = renameColumn(avg, "avg_dep", "avg_departement")
-    renamed.show
+    val dfCities = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/cities.csv")
+    val dfDepartements = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departments.csv")
+    val dfRegions = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/regions.csv")
+    secondWork(dfCities, dfDepartements, dfRegions).show
 
-    renamed.write.mode("overwrite").parquet("src/main/data/region/")*/
   }
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
@@ -50,5 +48,55 @@ object HelloWorld {
 
     val stringUdf = udf(stringAdapter)
     dataFrame.withColumn("code_departement", stringUdf(col("code_departement")) as "code_departement")
+  }
+
+  def firstWork(dataFrame: DataFrame): DataFrame = {
+    val dfClean = cleanDf(dataFrame)
+    dfClean.show()
+    val avg = avgDepByReg(dfClean)
+    avg.show
+
+    val renamed = renameColumn(avg, "avg_dep", "avg_departement")
+    renamed.write.mode("overwrite").parquet("src/main/data/region/")
+    renamed
+  }
+
+  def secondWork(dataFrameCities: DataFrame, dataFrameDepartment: DataFrame, dataFrameRegions: DataFrame): DataFrame = {
+    val cityDfClean = renameColumn(
+      renameColumn(dataFrameCities, "city_name", "name"),
+      "city_slug",
+      "slug"
+    )
+    val departmentDfClean = renameColumn(
+      renameColumn(
+        renameColumn(dataFrameDepartment, "department_name", "name"),
+        "department_id",
+        "id"
+      ),
+      "department_slug",
+      "slug"
+    )
+    val regionDfClean = renameColumn(
+      renameColumn(
+        renameColumn(dataFrameRegions, "region_name", "name"),
+        "region_id",
+        "id"
+      ),
+      "region_slug",
+      "slug"
+    )
+
+    val joined_df = cityDfClean.join(
+      departmentDfClean
+      , col("department_code") === departmentDfClean.col("code")
+      , "inner"
+    ).join(
+      regionDfClean
+      , col("region_code") === regionDfClean.col("code")
+      , "inner"
+    ).drop("code")
+
+    joined_df.write.mode("overwrite").parquet("src/main/data/region_2/")
+    joined_df
   }
 }

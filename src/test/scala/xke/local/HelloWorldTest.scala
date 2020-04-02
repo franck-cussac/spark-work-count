@@ -1,7 +1,9 @@
 package xke.local
 
+import org.apache.spark.sql.functions.col
 import org.scalatest.{FunSuite, GivenWhenThen}
 import spark.{DataFrameAssertions, SharedSparkSession}
+import xke.local.HelloWorld.{cleanDf, renameColumn}
 
 class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertions {
   val spark = SharedSparkSession.sparkSession
@@ -86,15 +88,76 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }
 
   test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
-    HelloWorld.main(Array("", ""))
-
+    val df = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")
+    HelloWorld.firstWork(df)
 
     val actually = spark.read.parquet("src/main/data/region/")
 
-    val df = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")
-    val av = HelloWorld.avgDepByReg(df)
+    val dfClean = cleanDf(df)
+    val av = HelloWorld.avgDepByReg(dfClean)
     val expected = HelloWorld.renameColumn(av, "avg_dep", "avg_departement")
 
+
+    assertDataFrameEquals(actually, expected)
+  }
+
+  test("je veux vérifier que je joins les trois fichiers et sauvegardes mon fichier en parquet") {
+    val dfCities = spark.sparkContext.parallelize(
+      List(
+        (1,"01","01001","01400","L'Abergement-Clémenciat","l abergement clemenciat",46.156781992032,4.9246992031872),
+        (2,"01","01002","01640","L'Abergement-de-Varey","l abergement de varey",46.010085625,5.4287591666667),
+        (938,"02","02543","02470","Neuilly-Saint-Front","neuilly saint front",49.167268791946,3.2576386577181)
+      )
+    ).toDF("id","department_code","insee_code","zip_code","name","slug","gps_lat","gps_lng")
+    val dfDepartments = spark.sparkContext.parallelize(
+      List(
+        (1,84,"01","Ain","ain"),
+        (2,32,"02","Aisne","aisne")
+      )
+    ).toDF("id","region_code","code","name","slug")
+    val dfRegions = spark.sparkContext.parallelize(
+      List(
+        (16,84,"Auvergne-Rhône-Alpes","auvergne rhone alpes"),
+        (10,32,"Hauts-de-France","hauts de france")
+      )
+    ).toDF("id","code","name","slug")
+    HelloWorld.secondWork(dfCities, dfDepartments, dfRegions)
+
+    val actually = spark.read.parquet("src/main/data/region_2/")
+
+    val cityDfClean = renameColumn(
+      renameColumn(dfCities, "city_name", "name"),
+      "city_slug",
+      "slug"
+    )
+    val departmentDfClean = renameColumn(
+      renameColumn(
+        renameColumn(dfDepartments, "department_name", "name"),
+        "department_id",
+        "id"
+      ),
+      "department_slug",
+      "slug"
+    )
+    val regionDfClean = renameColumn(
+      renameColumn(
+        renameColumn(dfRegions, "region_name", "name"),
+        "region_id",
+        "id"
+      ),
+      "region_slug",
+      "slug"
+    )
+
+    val expected = cityDfClean.join(
+      departmentDfClean
+      , col("department_code") === departmentDfClean.col("code")
+      , "inner"
+    ).join(
+      regionDfClean
+      , col("region_code") === regionDfClean.col("code")
+      , "inner"
+    ).drop("code")
 
     assertDataFrameEquals(actually, expected)
   }
