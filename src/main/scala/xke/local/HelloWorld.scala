@@ -24,7 +24,7 @@ object HelloWorld {
       val jointure = joinDeptsAndCities(dfDepts, dfCities)
       writeParquet(
         renameColumn(
-          avgDepByReg(dfDepts)
+          avgDepByReg(jointure)
         )
       )
     }
