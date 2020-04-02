@@ -118,4 +118,41 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assert(spark.read.parquet("src/main/resources/file.parquet").columns.length === 3)
   }
 
+  test("I want to convert '02fers7' to whole") {
+    Given("A chain of characters '027'")
+    val input = "02fers7"
+    val expected = 27
+
+    When("I convert in full")
+    val actual = HelloWorld.convertStringToInt(input)
+
+    Then("I would like to get 27")
+    assert(actual === expected)
+  }
+
+
+
+  test("I want to convert 'efdefd65' to whole") {
+    Given("A chain of characters '65'")
+    val input = "efdefd65"
+    val expected = 65
+
+    When("I convert in full")
+    val actual = HelloWorld.convertStringToInt(input)
+
+    Then("I would like to get 65")
+    assert(actual === expected)
+  }
+
+  test("I want to convert 'a01443h' to whole") {
+    Given("A chain of characters '1443h'")
+    val input = "a01443h"
+    val expected = 1443
+
+    When("I convert in full")
+    val actual = HelloWorld.convertStringToInt(input)
+
+    Then("I would like to get 1443")
+    assert(actual === expected)
+  }
 }

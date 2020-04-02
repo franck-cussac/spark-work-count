@@ -1,6 +1,7 @@
 package xke.local
 
 import org.apache.spark.sql._
+import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 
 object HelloWorld {
@@ -29,8 +30,14 @@ object HelloWorld {
 
     // Display
     dfRename.show
-
   }
+
+  val convertStringToIntUDF: UserDefinedFunction = udf(convertStringToInt _)
+
+  def convertStringToInt(value: String): Int = {
+    value.filter(Character.isDigit).toInt
+  }
+
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
     dataFrame.withColumn("code_departement", dataFrame.col("code_departement")
