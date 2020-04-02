@@ -87,7 +87,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(actual, expected)
   }
 
-  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
+ /* test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
     Given("a dataframe from file")
     spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france-short.csv")
 
@@ -106,7 +106,6 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(main, expected)
   }*/
 
-
   test("je veux verifier que mon string est bien transformé en int") {
     Given("a string")
     val str = "1"
@@ -123,14 +122,43 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     val res = HelloWorld.stringToInt(str)
     Then("I check typeof")
     assert(res === 1)
-  }
+  }*/
 
   test("je veux verifier que les caractères sont bien retirés") {
     Given("a string")
-    val str = "01A"
+    val str = "02A"
     When("I call the function")
     val res = HelloWorld.stringToInt(str)
     Then("I check typeof")
-    assert(res === 1)
+    assert(res === 2)
+  }
+
+  test("Test de la fonction join avec udf") {
+    Given("2 DFs")
+    val df1 = spark.sparkContext.parallelize(
+      List(
+        ("col1_data_1", "01"),
+        ("col1_data_2", "A2")
+      )
+    ).toDF("col1", "col2")
+    val df2 = spark.sparkContext.parallelize(
+      List(
+        ("1", "col3_data_1"),
+        ("02A", "col3_data_2")
+      )
+    ).toDF("col2", "col3")
+
+    When("I call the function")
+    val res = HelloWorld.joinWithUdf(df1, df2, "col2")
+    res.show()
+    Then("I check DFs are equal")
+    val expected = spark.sparkContext.parallelize(
+      List(
+        ("col1_data_1", 1, "col3_data_1"),
+        ("col1_data_2", 2, "col3_data_2")
+      )
+    ).toDF("col1", "col2", "col3")
+
+    assertDataFrameEquals(res, expected)
   }
 }
