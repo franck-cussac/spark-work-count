@@ -21,12 +21,14 @@ object HelloWorld {
     if (args.length == 0) {
       val dfDepts = getDFDepartments(spark)
       val dfCities = getDFCities(spark)
-      val jointure = joinDeptsAndCities(dfDepts, dfCities)
       writeParquet(
         renameColumn(
-          avgDepByReg(jointure)
+          avgDepByReg(dfDepts)
         )
       )
+
+      val jointure = joinDeptsAndCities(dfDepts, dfCities)
+      writeParquetByRegionAndDept(jointure)
     }
 
     // pour les tests
@@ -82,6 +84,9 @@ object HelloWorld {
   }
   def writeParquet(df: DataFrame): Unit = {
     df.write.mode("overwrite").parquet("src/main/parquets/output.parquet")
+  }
+  def writeParquetByRegionAndDept(df: DataFrame): Unit = {
+    df.write.partitionBy("code_region", "code_departement").mode("overwrite").parquet("src/main/parquets/byRegionAndDepts.parquet")
   }
 
   // créer une UDF :
