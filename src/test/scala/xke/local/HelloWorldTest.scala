@@ -81,7 +81,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(actual, expected)
   }
 
-  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
+  test("je veux vérifier que je lis mon fichier departement, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
     Given("une dataframe avec au moins 3 colonnes : nom région, code région et numéro département")
     val columns = Array(
       "code_region",
@@ -95,7 +95,6 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     Then("J'ai mon paquet")
     columns shouldEqual actual
-
   }
 
   test("je veux Convertir '2' en Int") {
