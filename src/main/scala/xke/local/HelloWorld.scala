@@ -4,6 +4,7 @@ import com.sun.org.apache.xalan.internal.xsltc.compiler.util.IntType
 import org.apache.avro.generic.GenericData.StringType
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.sql._
+import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
 
@@ -20,6 +21,8 @@ object HelloWorld {
     writeParquet(dataFrame = newDfName, "ParquetResult")
     showParquet(spark ,"ParquetResult")
   }
+
+  val stringToIntUdf: UserDefinedFunction = udf(stringToInt _ )
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
     dataFrame.groupBy(col("code_region")).avg("code_departement").as("avg_dep")
@@ -45,4 +48,11 @@ object HelloWorld {
   def showParquet(spark: SparkSession, pathToFile: String){
     spark.read.parquet(pathToFile).show
   }
+
+  def stringToInt(str: String): Int = {
+    str.filter(Character.isDigit).toInt
+  }
+
+  
+
 }
