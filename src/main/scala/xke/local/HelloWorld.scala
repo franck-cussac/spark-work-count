@@ -50,4 +50,7 @@ object HelloWorld {
   def joinDf(dfDepartement: DataFrame,dfCities: DataFrame): DataFrame = {
     dfDepartement.join(dfCities,dfDepartement("code_departement") === dfCities("department_code"))
   }
+
+
+
 }
