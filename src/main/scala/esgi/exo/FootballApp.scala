@@ -32,12 +32,29 @@ object FootballApp {
     // Rename column X6
     val dfX6Renamed = renameColumn(dfX2Renamed, "X6", "competition")
 
-    var dfClean = selectColumns(dfX6Renamed)
+    val dfClean = selectColumns(dfX6Renamed)
 
-    val d = removeNull(dfClean: DataFrame)
+    val df = clean_data(dfClean)
+
+    val d = removeNull(df: DataFrame)
 
     val dfMatchGt1980 = filterMatchGt1980(d)
-    dfMatchGt1980.show(100, false)
+
+    val dfJoue = addColumn(dfMatchGt1980)
+
+    dfJoue.show(20, false)
+//
+
+    val scoreFrance = getAvgScorceFrance(dfJoue)
+
+    scoreFrance.show(800, false)
+//    writeStats(scoreFrance)
+
+    val ddd =  join(dfJoue, scoreFrance)
+
+    ddd.show()
+
+    writeResult(scoreFrance)
   }
 
   def fetchMatches(sparkSession: SparkSession): DataFrame = {
@@ -65,15 +82,93 @@ object FootballApp {
   val replaceNullByZeroUDF: UserDefinedFunction = udf(replaceNullByZero _)
 
   def replaceNullByZero(value: String): String = {
-       value match {
-       case null => "0"
-       case "NA" => "0"
-       case _ => value
-     }
+    value match {
+      case null => "0"
+      case "NA" => "0"
+      case _ => value
+    }
   }
 
   def castDate(dataFrame: DataFrame): DataFrame = {
-    dataFrame.withColumn("date",to_date(unix_timestamp(dataFrame.col("date"), "yyyy-MM-dd")
+    dataFrame.withColumn("date", to_date(unix_timestamp(dataFrame.col("date"), "yyyy-MM-dd")
       .cast("timestamp")))
   }
+
+  def addColumn(dataFrame: DataFrame): DataFrame = {
+    dataFrame.withColumn("joue", splitColumn(col("match")))
+  }
+
+  val splitColumn: UserDefinedFunction = udf(mat _)
+
+
+  def mat(thematch: String): Boolean = {
+    val dat = thematch.trim.split(' ')(0)
+    dat match {
+      case "France" => true
+      case _ => false
+    }
+  }
+
+  def getAvgScorceFrance(dataFrame: DataFrame): DataFrame = {
+    dataFrame.groupBy("adversaire").agg(
+      avg(col("score_france")).as("avg_score"),
+      avg(col("score_adversaire")).as("avg_score_adversaire"),
+      count(col("match")).as("match_total"),
+      (sum(when(col("joue") === true, 1)) / count(col("joue")) * 100).as("percentage_match_joue_domicile"),
+      sum(when(col("competition").contains("Coupe du monde"), 1)).as("total_match_play_world_cup"),
+      max(col("penalty_france")).as("max_number_penalty"),
+      (count(col("penalty_france")).as("dss")  - count(col("penalty_adversaire"))).as("number_penalty_adversaire")
+    )
+  }
+
+
+
+  val moyenneUdf: UserDefinedFunction = udf(moyenneB _)
+  def moyenneB(thematch: String): Boolean = {
+    val dat = thematch.trim.split(' ')(0)
+    dat match {
+      case "France" => true
+      case _ => false
+    }
+  }
+
+  def writeStats(dataFrame: DataFrame): Unit = {
+    dataFrame.write
+      .mode("overwrite")
+      .parquet("src/main/resources/stats.parquet")
+  }
+
+  def writeResult(dataFrame: DataFrame): Unit = {
+    dataFrame.write
+      .mode("overwrite")
+      .parquet("src/main/resources/result.parquet")
+  }
+
+
+  def clean_data(dataFrame: DataFrame): DataFrame = {
+    dataFrame
+      .filter(clean(col("match") ))
+  }
+
+  val clean: UserDefinedFunction = udf(isValidLine _)
+
+  def isValidLine(value: String): Boolean = {
+    value match {
+      case "Yougoslavie" => false
+      case "\"France - Royaume des" => false
+      case " Croates et Slovènes\"" => false
+      case _ => true
+    }
+  }
+
+
+
+  def join(dfPart1: DataFrame, dfPart2: DataFrame): DataFrame = {
+    dfPart1.join(dfPart2, dfPart1("adversaire") === dfPart2("adversaire"), "left_outer")
+      .drop("adversaire")
+  }
+
+  val cond: UserDefinedFunction = udf(isValidLine _)
+
+
 }

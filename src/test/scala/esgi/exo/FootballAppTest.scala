@@ -1,5 +1,8 @@
 package esgi.exo
 
+import esgi.exo.FootballApp.mat
+import org.apache.spark.sql.expressions.UserDefinedFunction
+import org.apache.spark.sql.functions.udf
 import org.scalatest.{FunSuite, GivenWhenThen}
 import spark.{DataFrameAssertions, SharedSparkSession}
 
@@ -99,6 +102,32 @@ class FootballAppTest extends FunSuite with GivenWhenThen with DataFrameAssertio
     Then("Je m'attend à ce qu'il n'y ai des dates supérieur à 1980-03-01")
     assertDataFrameEquals(actual, expected)
   }
+
+//  test("je veux ajouter une colonne pour savoir si le match a été joué à domicile") {
+//    Given("une dataframe avec au moins 8 colonnes : match, competition, adversaire, score_france, score_adversaire, penalty_france, penalty_adversaire")
+//
+//    val splitColumn: UserDefinedFunction = udf(mat _)
+//
+//    val input = spark.sparkContext.parallelize(
+//      List(
+//        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02")
+//      ))
+//      .toDF(
+//        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
+//
+//    val expected = spark.sparkContext.parallelize(
+//      List(
+//        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02")
+//      ))
+//      .toDF(
+//        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date", "joue")
+//
+//    When("J'a")
+//    val actual = FootballApp.mat(input)
+//
+//    Then("Je m'attend à ce qu'il n'y ai une dataframe avec une nouvelle colonne joue")
+//    assertDataFrameEquals(actual, expected)
+//  }
 
 
 }
