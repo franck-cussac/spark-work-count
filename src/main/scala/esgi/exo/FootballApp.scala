@@ -15,7 +15,9 @@ object FootballApp {
 
     val statsParquet = spark.read.parquet("src/main/data/match_stats/")
 
-    val joinedDf = cleanedDf.join(statsParquet, cleanedDf.col("adversaire") === statsParquet.col("adversaire"), "rightouter")
+    val joinedDf = cleanedDf.withColumnRenamed("adversaire","adversaire_drop")
+      .join(statsParquet, col("adversaire_drop") === statsParquet.col("adversaire"), "inner")
+      .drop("adversaire_drop")
     joinedDf.show
   }
 
