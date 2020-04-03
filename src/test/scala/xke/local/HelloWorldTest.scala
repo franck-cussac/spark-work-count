@@ -1,84 +1,80 @@
 package xke.local
 
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.scalatest.{FunSuite, GivenWhenThen}
 import spark.{DataFrameAssertions, SharedSparkSession}
 
 class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertions {
-  val spark: SparkSession = SharedSparkSession.sparkSession
+  val sparkSession: SparkSession = SharedSparkSession.sparkSession
 
-  import spark.implicits._
+  import sparkSession.implicits._
 
-  test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
-    Given("un dataframe avec une région et deux département pour une moyenne")
-
-    val input = spark.sparkContext.parallelize(
-      List(
-        ("12", "Ile de france", 75),
-        ("10", "Ile de france", 75),
-        ("8", "Ile de france", 75),
-        ("5", "Auvergne", 70)
-      )
-    ).toDF("code_departement", "nom_region", "code_region")
+  test("ajout de colonne avec moyenne des numéros de département par région") {
+    Given("dataframe avec les premiers départements, le nom département, la région et nom région")
+    val input = List(
+      ("01", "Ain", 84, "Auvergne-Rhône-Alpes"),
+      ("02", "Aisne", 32, "Hauts-de-France"),
+      ("03", "Allier", 84, "Auvergne-Rhône-Alpes"),
+      ("04", "Alpes-de-Haute-Provence", 93, "Provence-Alpes-Côte d'Azur")
+    ).toDF("code_departement", "nom_departement", "code_region", "nom_region")
 
     When("j'appelle la fonction de moyenne")
-
     val actual = HelloWorld.getAverageDepartmentNumberByRegion(input)
 
-    Then("les dataframes doivent être les mêmes")
-
-    val expected = spark.sparkContext.parallelize(
-      List(
-        (75, 10, "Ile de france"),
-        (70, 5, "Auvergne")
-      )
-    ).toDF("code_region", "avg(code_departement)", "nom_region")
-
-    assertDataFrameEquals(actual, expected)
-
-  }
-
-  test("je veux renommer la colonne des moyennes des numéros département") {
-
-    Given("un dataframe avec la colonne avg")
-    val input = spark.sparkContext.parallelize(
-      List(
-        (75, 10, "Ile de france"),
-        (70, 5, "Auvergne")
-      )
-    ).toDF("code_region", "avg(code_departement)", "nom_region")
-
-    When("j'appelle la fonction de renommage")
-    val actual = HelloWorld.renameAverageColumn(input)
-
-    Then("les dataframes doivent être les mêmes")
-    val expected = spark.sparkContext.parallelize(
-      List(
-        (75, 10, "Ile de france"),
-        (70, 5, "Auvergne")
-      )
-    ).toDF("code_region", "avg_dep", "nom_region")
+    val expected = List(
+      (32, "Hauts-de-France", 2.0),
+      (84, "Auvergne-Rhône-Alpes", 2.0),
+      (93, "Provence-Alpes-Côte d'Azur", 4.0)
+    ).toDF("code_region", "nom_region", "avg(code_departement)")
 
     assertDataFrameEquals(actual, expected)
   }
 
-  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
-    Given("un dataframe rétréci provenant d'un fichier")
-    spark.read.option("delimiter", ",").option("header", value = true).csv("src/main/resources/departements-france-small.csv")
+  test("je renomme avg(code_departement) en avg_dep") {
+    Given("dataframe avec les premiers code région, nom région et moyenne du numéro de département")
+    val input = List(
+      (32, "Hauts-de-France", 2.0),
+      (84, "Auvergne-Rhône-Alpes", 2.0),
+      (93, "Provence-Alpes-Côte d'Azur", 4.0)
+    ).toDF("code_region", "nom_region", "avg(code_departement)")
 
-    val expected = spark.sparkContext.parallelize(
-      List(
-        (84, 1, "Auvergne-Rhone-Alpes"),
-        (32, 2, "Hauts-de-France")
-      )
-    ).toDF("code_region", "avg_dep", "nom_region")
+    When("j'appelle le renommage")
+    val actual = HelloWorld.renameAverageColumn(
+      input)
 
-    When("j'appelle la fonction principale")
-    HelloWorld.main(null)
-    val main = spark.read.parquet("src/main/parquet/exo.parquet")
+    val expected = List(
+      (32, "Hauts-de-France", 2.0),
+      (84, "Auvergne-Rhône-Alpes", 2.0),
+      (93, "Provence-Alpes-Côte d'Azur", 4.0)
+    ).toDF("code_region", "nom_region", "avg_dep")
 
-    Then("les dataframes doivent être les mêmes")
-    assertDataFrameEquals(main, expected)
+    assertDataFrameEquals(actual, expected)
   }
 
+  test("je veux créer mon fichier parquet") {
+    Given("dataframe avec les premiers départements, le nom département, la région et nom région")
+    val parquetLocation = "src/test/resources/parquet"
+
+    val input = sparkSession.sparkContext.parallelize(List(
+      ("01", "Ain", 84, "Auvergne-Rhône-Alpes"),
+      ("02", "Aisne", 32, "Hauts-de-France"),
+      ("03", "Allier", 84, "Auvergne-Rhône-Alpes"),
+      ("04", "Alpes-de-Haute-Provence", 93, "Provence-Alpes-Côte d'Azur")
+    )).toDF("code_departement", "nom_departement", "code_region", "nom_region")
+
+    When("je renomme, calcule la moyenne puis créer le fichier parquet")
+    HelloWorld.renameAverageColumn(
+      HelloWorld.getAverageDepartmentNumberByRegion(input)
+    ).write.mode(SaveMode.Overwrite).parquet(parquetLocation)
+
+    val output = sparkSession.sqlContext.read.parquet(parquetLocation)
+
+    val expected = List(
+      (32, "Hauts-de-France", 2.0),
+      (84, "Auvergne-Rhône-Alpes", 2.0),
+      (93, "Provence-Alpes-Côte d'Azur", 4.0)
+    ).toDF("code_region", "nom_region", "avg_dep")
+
+    assertDataFrameEquals(output, expected)
+  }
 }
