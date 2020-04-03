@@ -1,24 +1,21 @@
 package esgi.exo.FootballApp
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{avg, _}
 
 object FootballApp {
   def main(args: Array[String]): Unit = {
     val isDomicile: UserDefinedFunction = udf(isHome _)
-    //val sumMatch: UserDefinedFunction = udf(nbMatch _)
 
     val spark = SparkSession.builder().appName("FootballApp").master("local[*]").getOrCreate()
     val df = spark.read.option("header", true).csv("src/main/resources/df_matches.csv")
-    df.show(500)
 
     val dfMatchesClean = renameAndSelect(df)
     val dfMatches = deleteNullValue(dfMatchesClean)
     val dfMatchFrance = dfMatches.filter(col("date").between("1980-03-01",current_date())).withColumn("penalty_france",col("penalty_france").cast("integer")).withColumn("match_a_domicile",isDomicile(col("match")))
-    dfMatchFrance.show
-
+    dfMatchFrance
+      .show
 
     val avgMatchFrance = avgScoreFrance(dfMatches)
     avgMatchFrance
@@ -27,23 +24,17 @@ object FootballApp {
     val avgMatchAdv = avgScoreAdversaire(dfMatches)
     avgMatchAdv.show
 
-    val nbMa = sumMatchParEquipe(dfMatches)
-    nbMa.show
-
-    /*dfMatchesFrance
+    val dfPercentageMatchHome= dfMatchFrance
       .groupBy("adversaire")
-      .agg(sum(when(col("match_a_domicile") === true, 1)) / count(col("match_a_domicile")) * 100).show*/
+      .agg(sum(when(col("match_a_domicile") === true,1)) / count(col("match_a_domicile")))
 
-    val dfPercentageMatchHome= dfMatchFrance.groupBy("adversaire").agg(sum(when(col("match_a_domicile") === true,1)) / count(col("match_a_domicile")))
-
+    println("Match dom")
     dfPercentageMatchHome.show
 
     dfMatchFrance
       .groupBy("match")
       .max("penalty_france")
       .show(100)
-
-
   }
 
   def renameAndSelect(dataFrame: DataFrame) : DataFrame = {
@@ -88,7 +79,6 @@ object FootballApp {
       .count()
       .as("Nombre de match")
   }
-
 
 
 }
