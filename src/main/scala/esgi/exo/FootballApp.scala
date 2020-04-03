@@ -115,9 +115,6 @@ object FootballApp {
   def atHome: String => Boolean = s => s.startsWith("France")
   val extractAtHome: UserDefinedFunction = udf(atHome)
 
-  def isWorldCup: String => Boolean = s => s.startsWith("Coupe du monde")
-  val extractIsWorldCup: UserDefinedFunction = udf(isWorldCup)
-
   def getMonthOfDate: String => String = s => s.substring(5, 7)
   val extractMonth: UserDefinedFunction = udf(getMonthOfDate)
 }
