@@ -46,10 +46,57 @@ class FootballAppTest extends FunSuite with GivenWhenThen with DataFrameAssertio
       .toDF(
         "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
 
-    When("Je sélectionnee")
+    When("Je sélectionne")
     val actual = FootballApp.selectColumns(input)
 
     Then("Je m'attend à ce que certaines colonnes soient supprimées")
+    assertDataFrameEquals(actual, expected)
+  }
+
+//  test("je veux selectionner remplacer les valeurs null par 0") {
+//    Given("une dataframe avec au moins 8 colonnes : match, competition, adversaire, score_france, score_adversaire, penalty_france, penalty_adversaire")
+//    val input = spark.sparkContext.parallelize(
+//      List(
+//        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", null, "1904-05-01")
+//      ))
+//      .toDF(
+//        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
+//
+//    val expected = spark.sparkContext.parallelize(
+//      List(
+//        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1904-05-01")
+//      ))
+//      .toDF(
+//        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
+//
+//    When("Je retire les éléments null")
+//    val actual = FootballApp.removeNull(input)
+//
+//    Then("Je m'attend à ce qu'il n'y ai pas d'éléments nul dans les pénalties")
+//    assertDataFrameEquals(actual, expected)
+//  }
+
+  test("je veux filter par date supérieur à 1980-03-01") {
+    Given("une dataframe avec au moins 8 colonnes : match, competition, adversaire, score_france, score_adversaire, penalty_france, penalty_adversaire")
+    val input = spark.sparkContext.parallelize(
+      List(
+        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02"),
+          ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1978-03-01")
+      ))
+      .toDF(
+        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02")
+      ))
+      .toDF(
+        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
+
+    When("Je filtre")
+    val actual = FootballApp.filterMatchGt1980(input)
+
+    Then("Je m'attend à ce qu'il n'y ai des dates supérieur à 1980-03-01")
     assertDataFrameEquals(actual, expected)
   }
 
