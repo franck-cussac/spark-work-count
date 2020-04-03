@@ -1,8 +1,6 @@
 package esgi.exo
 
-import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.{DataFrame, _}
 
 object FootballApp {
@@ -13,10 +11,13 @@ object FootballApp {
 
     val atHomeUDF = spark.udf.register("atHomeUDF",atHome)
 
+    // Rename et clean des colonnes
     val dfexo1 = exo1(df)
+    // ajout de la colonne at_home
     val dfWithAtHome = dfexo1.withColumn("at_home", atHomeUDF(col("match")))
+    // ajout des colonnes de stats
     val dfexo2 = exo2(dfWithAtHome)
-
+    // ecriture dans un parquet
     writeParquet(dfexo2)
     dfexo2.show()
 
@@ -24,25 +25,8 @@ object FootballApp {
 
   def exo1(dataFrame: DataFrame): DataFrame = {
 
-    val dfRenamedX4 = renameColumn(dataFrame, "X4", "match")
-
-    renameColumn(dfRenamedX4, "X6", "competition")
-      .select(
-        "match",
-        "competition",
-        "adversaire",
-        "score_france",
-        "score_adversaire",
-        "penalty_france" ,
-        "penalty_adversaire",
-        "date"
-      )
-      .withColumn("penalty_france", when(col("penalty_france") === "NA" || col("penalty_france") === "" , "0")
-      .otherwise(col("penalty_france")))
-      .withColumn("penalty_adversaire", when(col("penalty_adversaire") === "NA" || col("penalty_adversaire") === "" , "0")
-      .otherwise(col("penalty_adversaire")))
-      .filter(col("year") >= "1980")
-
+    val df = selectAndRenameColumns(dataFrame)
+    filterDate(df)
   }
 
   def exo2(dataFrame: DataFrame): DataFrame = {
@@ -62,6 +46,32 @@ object FootballApp {
       .drop("count(CASE WHEN at_home THEN true END)")
   }
 
+  def selectAndRenameColumns(dataFrame: DataFrame): DataFrame = {
+
+    val dfRenamedX4 = renameColumn(dataFrame, "X4", "match")
+
+    renameColumn(dfRenamedX4, "X6", "competition")
+      .select(
+        "match",
+        "competition",
+        "adversaire",
+        "score_france",
+        "score_adversaire",
+        "penalty_france" ,
+        "penalty_adversaire",
+        "date"
+      )
+      .withColumn("penalty_france", when(col("penalty_france") === "NA" || col("penalty_france") === "" , "0")
+        .otherwise(col("penalty_france")))
+      .withColumn("penalty_adversaire", when(col("penalty_adversaire") === "NA" || col("penalty_adversaire") === "" , "0")
+        .otherwise(col("penalty_adversaire")))
+
+  }
+
+  def filterDate(dataFrame: DataFrame): DataFrame = {
+    dataFrame.filter(col("year") >= "1980")
+  }
+
 
   def atHome = (detail: String) => {
     if (detail.startsWith("France")) {
@@ -72,7 +82,7 @@ object FootballApp {
     }
   }
 
-  
+
   def renameColumn(dataFrame: DataFrame, oldC : String, newC : String): DataFrame = {
     dataFrame.withColumnRenamed(oldC, newC)
   }
