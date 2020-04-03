@@ -18,6 +18,9 @@ object FootballApp {
     val joinedDf = cleanedDf.withColumnRenamed("adversaire","adversaire_drop")
       .join(statsParquet, col("adversaire_drop") === statsParquet.col("adversaire"), "inner")
       .drop("adversaire_drop")
+    joinedDf.withColumn("Year", substring_index(col("date"), "-", 1))
+      .withColumn("Month", substring_index(substring_index(col("date"), "-", -2), "-", 1))
+      .write.partitionBy("Year","Month").mode("overwrite").parquet("src/main/data/match_stats_2/")
     joinedDf.show
   }
 
@@ -31,8 +34,7 @@ object FootballApp {
   }
 
   def avgOpponentStat(dataFrame: DataFrame): DataFrame = {
-    val isHome = (s: String) => {s.startsWith("France -")}
-    val homeUdf = udf(isHome)
+    val homeUdf = udf(isHome _)
 
     val stats = dataFrame.withColumn("domicile", homeUdf(col("match")) as "domicile")
       .groupBy(col("adversaire"))
@@ -49,5 +51,9 @@ object FootballApp {
 
     stats.write.mode("overwrite").parquet("src/main/data/match_stats/")
     stats
+  }
+
+  def isHome(s: String): Boolean ={
+    s.startsWith("France -")
   }
 }
