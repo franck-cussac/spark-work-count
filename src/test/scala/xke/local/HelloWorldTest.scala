@@ -8,6 +8,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   val spark = SharedSparkSession.sparkSession
   import spark.implicits._
 
+
   test("Je veux ajouter une colonne avec la moyenne des numéros de département par région") {
     Given("Un dataframe avec 3 colonnes : code_departement, code_region, nom_region")
     val input = spark.sparkContext.parallelize(List(
@@ -47,7 +48,8 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
   test("Je veux tester que la lecture d'un fichier, le calcul de moyenne de département selon la région, le renommage d'une colonne et l'écriture du résultat dans un parquet fonctionnent"){
     Given("le lancement de la méthode main")
-    HelloWorld.departementExercises()
+
+    HelloWorld.departementExercises(spark)
     When("je vérifie les différentes colonnes du parquet")
     val df = spark.read.parquet("src/main/resources/toto")
     Then("les colonnes doivent être les même que dans le jeu de données de résultat")
@@ -99,7 +101,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
   test("Je veux tester que la jointure de deux DF et leur écriture dans un parquet fonctionne"){
     Given("le lancement de la méthode main")
-    HelloWorld.jointureDepartVille()
+    HelloWorld.jointureDepartVille(spark)
     When("je vérifie les différentes colonnes du parquet")
     val df = spark.read.parquet("src/main/resources/joinPartition")
     Then("les colonnes doivent exister")

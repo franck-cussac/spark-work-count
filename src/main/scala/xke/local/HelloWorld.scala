@@ -6,19 +6,19 @@ import org.apache.spark.sql.functions.udf
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
 
-import org.apache.spark.sql._
+
 
 
 object HelloWorld {
   def main(args: Array[String]): Unit = {
-    jointureDepartVille()
-    //departementExercises()
-  }
-
-  def jointureDepartVille(): Unit = {
     val spark = SparkSession.builder().master("local").appName("example of SparkSession").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
     SparkSession.builder()
+    jointureDepartVille(spark)
+    //departementExercises(spark)
+  }
+
+  def jointureDepartVille(spark: SparkSession): Unit = {
 
     val dfDepart = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv")
     val dfVilles = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/cities.csv")
@@ -43,10 +43,7 @@ object HelloWorld {
       .parquet("src/main/resources/joinPartition")
   }
 
-  def departementExercises(): Unit ={
-    val spark = SparkSession.builder().master("local").appName("example of SparkSession").getOrCreate()
-    spark.sparkContext.setLogLevel("ERROR")
-    SparkSession.builder()
+  def departementExercises(spark: SparkSession): Unit ={
 
     val df = spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/departements-france.csv").withColumn("code_departement", udfConvertToInt(col("code_departement")))
     df.show()
