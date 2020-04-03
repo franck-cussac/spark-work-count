@@ -12,29 +12,21 @@ object HelloWorld {
     val rename = renameColumn(avg)
     rename.show()
     writeToParquet(rename)
-
-    // code
-    // src/main/resources/departements-france.csv
-    // 1) lire le fichier
-    // 2) créer une colonne avec la moyenne des numéro département par code région
-    //    code_region, avg_dep, nom_region
-    // 3) renommer la colonne moyenne des départements en avg_dep
-    // 4) écrire le fichier en parquet
-
   }
 
   def avgDepByReg(input: DataFrame): DataFrame = {
-    return input
+    input
       .groupBy("code_region", "nom_region")
-      .agg(avg("code_departement")/*, first("nom_region").as("nom_region")*/)
+      .agg(avg("code_departement"))
   }
 
   def renameColumn(input: DataFrame): DataFrame = {
-    return input
+    input
       .withColumnRenamed("avg(code_departement)", "avg_dep")
   }
 
   def writeToParquet(input: DataFrame)  = {
-    input.write.mode("overwrite").parquet("src/main/parquet/ex1.parquet")
+    input.write.mode("overwrite")
+      .parquet("src/main/parquet/ex1.parquet")
   }
 }
