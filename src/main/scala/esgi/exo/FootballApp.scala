@@ -38,9 +38,9 @@ object FootballApp {
 
     val df = clean_data(dfClean)
 
-    val d = removeNull(df)
+    val dfWithoutNull = removeNull(df)
 
-    val dfMatchGt1980 = filterMatchGt1980(d)
+    val dfMatchGt1980 = filterMatchGt1980(dfWithoutNull)
 
     dfMatchGt1980.show(20, false)
 
