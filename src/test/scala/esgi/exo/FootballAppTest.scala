@@ -1,5 +1,6 @@
 package esgi.exo
 
+import org.apache.spark.sql.DataFrame
 import org.scalatest.{FunSuite, GivenWhenThen}
 import spark.{DataFrameAssertions, SharedSparkSession}
 
@@ -273,4 +274,47 @@ class FootballAppTest extends FunSuite with GivenWhenThen with DataFrameAssertio
     Then("Je devrais avoir la nouvelle colonne")
     assertDataFrameEquals(actual, expected)
   }
+
+  // Le test d'intégration ne fonctionne pas car il faut un fichier de plusieurs centaines de lignes
+  /*test("Je veux tester l'intégration, de la lecture du fichier source à la vérification de l'écriture") {
+    Given("Mon fichier source, et ce que je souhaite qu'il soit écrit")
+    val input = "src/main/resources/df_matches-test_data.csv"
+    val expected = List(
+      ("Belgique - France",	"Match amical",	"Belgique",	"3", "3", "0", "0", "1904-05-01",	"1904", false, "05", "1.2", "3.6", "5", "0", "0", "40.0", "0.0"),
+      ("France - Suisse",	"Match amical", "Suisse", "1", "0", "0", "0", "1905-02-12", "1905", true, "02", "1.5", "0.5", "2", "0", "0", "50.0", "0.0"),
+      ("Belgique - France",	"Match amical", "Belgique", "0", "7", "0", "0", "1905-05-07", "1905", false, "05", "1.2", "3.6", "5", "0", "0", "40.0", "0.0"),
+      ("France - Belgique",	"Match amical", "Belgique", "0", "5", "0", "0", "1906-04-22", "1906", true, "04", "1.2", "3.6", "5", "0", "0", "40.0", "0.0"),
+      ("France - Angleterre",	"Match amical", "Angleterre", "0", "1", "0", "0", "1906-11-01", "1906", true, "11", "5.0", "6.5", "2", "0", "0", "50.0", "0.0"),
+      ("Belgique - France",	"Match amical", "Belgique", "2", "1", "0", "0", "1907-04-21", "1907", false, "04", "1.2", "3.6", "5", "0", "0", "40.0", "0.0"),
+      ("Suisse - France",	"Match amical", "Suisse", "2", "1", "0", "0", "1908-03-08", "1908", false, "03", "1.5", "0.5", "2", "0", "0", "50.0", "0.0"),
+      ("Angleterre - France",	"Match amical", "Angleterre", "10", "12", "0", "0", "1908-03-23", "1908", false, "03", "5.0", "6.5", "2", "0", "0", "50.0", "0.0"),
+      ("France - Belgique",	"Match amical", "Belgique", "1", "2", "0", "0", "1908-04-12", "1908", true,	"04", "1.2", "3.6", "5", "0", "0", "40.0", "0.0")
+    ).toDF(
+      "match",
+      "competition",
+      "adversaire",
+      "score_france",
+      "score_adversaire",
+      "penalty_france",
+      "penalty_adversaire",
+      "date",
+      "year",
+      "a_domicile",
+      "month",
+      "avg_score_france",
+      "avg_score_adversaire",
+      "nb_matchs",
+      "nb_matchs_CDM",
+      "max_penalty_france",
+      "pourcentage_a_domicile",
+      "indice_penalty"
+    )
+
+    When("J'exécute le main, et je lis ce qui a été écrit")
+    FootballApp.main(Array[String](input))
+    val actual = spark.read.parquet("src/main/parquets/result.parquet")
+
+    Then("Je devrais avoir ces données")
+    assertDataFrameEquals(actual, expected)
+  }*/
 }

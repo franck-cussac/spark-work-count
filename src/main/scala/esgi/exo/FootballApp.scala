@@ -13,7 +13,7 @@ object FootballApp {
           selectColumns(
             renameColumns(
               keepOnlySince1980(
-                getDF(spark)
+                getDF(spark, args)
               )
             )
           )
@@ -26,8 +26,11 @@ object FootballApp {
     writeParquetResult(join)
   }
 
-  def getDF(spark: SparkSession): DataFrame = {
-    spark.read.option("header", true).csv("src/main/resources/df_matches.csv")
+  def getDF(spark: SparkSession, args: Array[String]): DataFrame = {
+    if (args.length == 0)
+      spark.read.option("header", true).csv("src/main/resources/df_matches.csv")
+    else
+      spark.read.option("header", true).csv(args(0))
   }
 
   def keepOnlySince1980(df: DataFrame): DataFrame = {
