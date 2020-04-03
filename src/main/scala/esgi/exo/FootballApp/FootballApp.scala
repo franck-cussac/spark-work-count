@@ -21,10 +21,9 @@ object FootballApp {
       .join(countMatchesWorldCup(cleanDf),"adversaire")
       .join(maxFrancePenality(cleanDf),"adversaire")
       .join(calculPenaltyDifference(cleanDf),"adversaire")
-      /*.write
+      .write
         .mode("overwrite")
-        .parquet("src/main/parquet/stats.parquet")*/
-      .show(1000)
+        .parquet("src/main/parquet/stats.parquet")
 
       val stats = spark.sqlContext.read.parquet("src/main/parquet/stats.parquet");
 
