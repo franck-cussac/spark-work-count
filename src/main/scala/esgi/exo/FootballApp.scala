@@ -9,30 +9,32 @@ import org.apache.spark.sql.DataFrameStatFunctions
 object FootballApp {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().master("local").appName("football exercise").getOrCreate()
-    val dfMatches = cleanUpDf(spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/df_matches.csv"))
-    val dfAverage = avgPointByOpponent(dfMatches)
-    writeWithoutPartition(dfAverage)
-    joinDf(dfMatches, dfAverage).show()
+    val dfMatches = cleanUpDf(spark.read.option("delimiter", ",").option("header", true).csv("src/main/resources/df_matches.csv")).withColumn("domicile", udfDomicile(col("match")))
+    val dfAverage = statistacs(dfMatches)
+    writeWithoutPartition(dfAverage, "src/main/resources/stats.parquet")
+    val result = joinDf(dfMatches, dfAverage)
+    writeInPartition(result, "src/main/resources/result.parquet")
   }
 
-  def writeWithoutPartition(toWrite: DataFrame): Unit = {
+  def writeWithoutPartition(toWrite: DataFrame, path: String): Unit = {
     toWrite
       .write
       .mode("overwrite")
-      .parquet("src/main/resources/stats.parquet")
+      .parquet(path)
   }
 
   def joinDf(dfMatchs: DataFrame, dfStatsMatchs: DataFrame): DataFrame =
     dfMatchs.join(dfStatsMatchs, dfMatchs("adversaire") === dfStatsMatchs("adversaire"), "left_outer")
       .drop(dfMatchs("adversaire"))
 
-  def writeInPartition(toWrite: DataFrame, col1: String, col2: String): Unit = {
+  def writeInPartition(toWrite: DataFrame, path: String): Unit = {
     toWrite
       .withColumn("year", year(col("date")))
       .withColumn("month", month(col("date")))
       .write
+      .mode("overwrite")
       .partitionBy("year", "month")
-      .parquet("src/main/resources/result.parquet")
+      .parquet(path)
   }
 
   def renameColumn(dataFrame: DataFrame, originalString: String, newName: String): DataFrame = {
@@ -50,7 +52,7 @@ object FootballApp {
 
   //j'ai considéré que penalty reçu par la France est la colonne penalty_france on m'a dit que c'était l'inverse apparemment mais j'ai laissé car je pense que la
   //logique reste la même
-  def avgPointByOpponent(dataFrame: DataFrame): DataFrame = {
+  def statistacs(dataFrame: DataFrame): DataFrame = {
     dataFrame.groupBy( "adversaire").
       agg(avg("score_france").as("score_moyen"),
       avg("score_adversaire").as("score_moyen_adversaire"),
@@ -63,6 +65,10 @@ object FootballApp {
   }
 
   def udfConvertNa: UserDefinedFunction = udf(convertNa)
+
+  def domicile: String => Boolean = value => value.startsWith("France -")
+
+  def udfDomicile: UserDefinedFunction = udf(domicile)
 
   def convertNa: String => Int = {
     case "NA" => 0
