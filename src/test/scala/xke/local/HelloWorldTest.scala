@@ -70,7 +70,6 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     val av = HelloWorld.avgDepByReg(dfClean)
     val expected = HelloWorld.renameColumn(av, "avg_dep", "avg_departement")
 
-
     assertDataFrameEquals(actually, expected)
   }
 
