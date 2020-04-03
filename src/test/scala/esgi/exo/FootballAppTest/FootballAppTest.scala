@@ -46,15 +46,15 @@ class FootballAppTest extends FunSuite with GivenWhenThen with DataFrameAssertio
 
   test("je veux recuperer ma dataframe des matchs de l'equipe de france") {
     val columns = Array(
-      "adversaire",
-      "score_france",
-      "score_adversaire"
+      "X2", "penalty_adversaire", "X6", "score_france", "penalty_france",
+      "outcome", "year", "X5", "adversaire", "score_adversaire",
+      "date", "X4", "no"
     ).toSet
 
     When("J'appel ma methode")
     val actual = FootballApp.getFootballInfosDF().schema.fieldNames.toSet
 
-    Then("J'ai mon dataframe")
+    Then("J'ai ma dataframe")
     columns shouldEqual actual
   }
 }
