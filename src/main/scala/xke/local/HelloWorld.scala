@@ -14,8 +14,8 @@ object HelloWorld {
     val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate()
 
     if (args.length >= 3) {
-      val result = readDataAndApplyTransformations(spark, args(0), args(1))
 
+      val result = readDataAndApplyTransformations(spark, args(0), args(1))
       result.write
         .partitionBy("code_region", "code_departement")
         .mode(SaveMode.Overwrite)
@@ -23,8 +23,8 @@ object HelloWorld {
 
       result.show()
     } else {
-      val result = readDataAndApplyTransformations(spark, DEFAULT_DEPARTMENT_DATA_PATH, DEFAULT_CITIES_DATA_PATH)
 
+      val result = readDataAndApplyTransformations(spark, DEFAULT_DEPARTMENT_DATA_PATH, DEFAULT_CITIES_DATA_PATH)
       result.write
         .partitionBy("code_region", "code_departement")
         .mode(SaveMode.Overwrite)
