@@ -13,7 +13,7 @@ object HelloWorld {
     val spark = SparkSession.builder().master("local[*]").appName("").getOrCreate()
 
     val df = readCSVFile(spark, "src/main/resources/departements-france.csv")
-    val dfIntColumn = df.withColumn("code_departement", col("code_departement").cast(IntegerType))
+    val dfIntColumn = df.withColumn("code_departement", stringToIntUdf(col("code_departement")))
     val newDF = avgDepByReg(dataFrame = dfIntColumn)
     val newDfColumn = newColumn(dataFrame = newDF, columnName = "average", value = lit(""))
     val newDfName = renameColumn(dataFrame = newDfColumn, columnName = "avg(code_departement)", newName = "avg_dep")
@@ -22,7 +22,7 @@ object HelloWorld {
     showParquet(spark ,"ParquetResult")
   }
 
-  val stringToIntUdf: UserDefinedFunction = udf(stringToInt _ )
+  val stringToIntUdf: UserDefinedFunction = udf(stringToInt _ , IntegerType)
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
     dataFrame.groupBy(col("code_region")).avg("code_departement").as("avg_dep")
@@ -53,6 +53,17 @@ object HelloWorld {
     str.filter(Character.isDigit).toInt
   }
 
-  
+  def partitionJoin(dataFrame: DataFrame, col1Name: String, col2Name: String, path: String): Unit = {
+    dataFrame.write
+              .partitionBy(col1Name, col2Name)
+              .mode("overwrite")
+              .parquet(path)
+  }
+
+  def udfJoin(dataFrame: DataFrame, columnName: String, toModifyDF: DataFrame) = {
+    dataFrame.withColumn(columnName,stringToIntUdf(dataFrame(columnName))
+              .as(columnName))
+              .join(toModifyDF.withColumn(columnName, stringToIntUdf(toModifyDF(columnName)).as(columnName)), columnName)
+  }
 
 }

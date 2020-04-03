@@ -30,7 +30,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(actual, expected);
   }
 
-  test("je veux renommer la colonne des moyennes des numéros département") {
+  test("Je veux renommer la colonne des moyennes des numéros département") {
     val input = spark.sparkContext.parallelize(List(
       (1, 3.0, "toto"),
       (2, 20.0, "zaza")
@@ -41,7 +41,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
       (2, 20.0, "zaza")
     )).toDF("code_region", "avg_dep", "nom_region")
 
-    When("on renomme la colonne des moyennes")
+    When("Je veux renommer la colonne des moyennes.")
     val actual = HelloWorld.renameColumn(input, columnName = "avg(code_departement)", newName = "avg_dep")
 
     Then("Je avoir la colonne renommée")
@@ -70,10 +70,39 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   test("Je veut convertir une chaine de caractère en nombre") {
     Given("Une chaine de caractère composée de chiffre et de lettres")
     val input = "045d45"
-    When("Quand jexécute la fonction")
+    When("Quand j'exécute la fonction")
     val expected = 4545
     val actual = HelloWorld.stringToInt(input)
     Then("J'ai le résultat attendu")
     assert(actual === expected)
+  }
+
+  test("Je veux join avec udf") {
+    Given("2 DFs")
+    val df1 = spark.sparkContext.parallelize(
+      List(
+        ("valeur1", "01"),
+        ("valeur2", "A2")
+      )
+    ).toDF("col1", "col2")
+    val df2 = spark.sparkContext.parallelize(
+      List(
+        ("1", "valeur3"),
+        ("02A", "valeur4")
+      )
+    ).toDF("col2", "col3")
+
+    When("I call the function")
+    val res = HelloWorld.udfJoin(df1, "col2", df2)
+
+    Then("Je vérifie que les df sont égales")
+    val expected = spark.sparkContext.parallelize(
+      List(
+        ("valeur1", 1, "valeur3"),
+        ("valeur2", 2, "valeur4")
+      )
+    ).toDF("col1", "col2", "col3")
+
+    assertDataFrameEquals(res, expected)
   }
 }
