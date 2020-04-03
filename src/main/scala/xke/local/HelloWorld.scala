@@ -55,5 +55,5 @@ object HelloWorld {
   def writeParquet(df: DataFrame): Unit =
     df.write.partitionBy("code_region", "code_departement")
       .mode("overwrite")
-      .parquet("src/main/parquets/file.parquet")
+      .parquet("src/main/resources/file.parquet")
 }

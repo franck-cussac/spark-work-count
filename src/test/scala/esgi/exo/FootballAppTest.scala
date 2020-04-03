@@ -63,29 +63,59 @@ class FootballAppTest extends FunSuite with GivenWhenThen with DataFrameAssertio
   }
 
   test("Je veux faire la jointure entre les matchs et les stats") {
-    Given("")
+    Given("2 dataframes avec l'adversaire comme point commun")
     val inputMatchs = List(
       ("Angleterre", 2, "toto"),
-      ("Italie", 3, "toto"),
-      ("Espagne", 4, "toto"),
-      ("Croatie", 15, "tata"),
-    ).toDF("adversaire", "code_departement", "nom_region")
+      ("Italie", 3, "tata"),
+      ("Espagne", 4, "titi"),
+      ("Croatie", 15, "toto")
+    ).toDF("adversaire", "day", "lieu")
 
     val inputStats = List(
-      (2, "Nantes"),
-      (15, "Reims"),
-      (16, "Charleville"),
-      (17, "Sedan")
-    ).toDF("department_code", "name")
+      ("Angleterre", 25, 2),
+      ("Italie", 50, 4),
+      ("Espagne", 75, 6),
+      ("Croatie", 100, 8)
+    ).toDF("adversaire", "ratio", "buts")
 
-    val expected = List(
-
-    )
-
-    When("")
+    When("J'appelle ma fonction join pour rassembler les 2 dataframes")
     val actual = FootballApp.joinDf(inputMatchs, inputStats)
+    actual
 
-    Then("")
+    Then("Mes dataframes doivent être regroupés dans le même dataframe")
+    val expected = List(
+      ("Angleterre", 25, 2, 2, "toto"),
+      ("Italie", 50, 4, 3, "tata"),
+      ("Espagne", 75, 6, 4, "titi"),
+      ("Croatie", 100, 8, 15, "toto")
+    ).toDF("adversaire", "ratio", "buts", "day", "lieu")
+
     assertDataFrameEquals(actual, expected)
+  }
+
+  test("Ecriture en parquet") {
+    Given("Un dataframe a écrire en parquet")
+    val output = "src/main/resources/stats.parquet"
+
+    val input = List(
+      ("Angleterre", 25, 1980, 2, "toto"),
+      ("Italie", 50, 1981, 3, "tata"),
+      ("Espagne", 75, 1982, 4, "titi"),
+      ("Croatie", 100, 1983, 12, "toto")
+    ).toDF("adversaire", "ratio", "year", "month", "lieu")
+
+    When("Lorsque j'appelle ma fonction permettant d'écrire en parquet")
+    FootballApp.writeParquet(input)
+
+    Then("Le fichier que j'ai écrit en parquet doit être le même que celui saisit en input")
+    val expected = List(
+      ("Angleterre", 25, 1980, 2, "toto"),
+      ("Italie", 50, 1981, 3, "tata"),
+      ("Espagne", 75, 1982, 4, "titi"),
+      ("Croatie", 100, 1983, 12, "toto")
+    ).toDF("adversaire", "ratio", "year", "month", "lieu")
+
+    val outputDf = spark.sqlContext.read.parquet(output)
+    assertDataFrameEquals(outputDf, expected)
   }
 }
