@@ -157,5 +157,4 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     assertDataFrameEquals(actually, expected)
   }
-
 }

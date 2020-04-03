@@ -10,18 +10,34 @@ object FootballApp {
     val df = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/df_matches.csv")
     val cleanedDf = cleanDf(df)
     cleanedDf.cache()
-    cleanedDf.show
-    avgOpponentStat(cleanedDf).show
+    val stats = avgOpponentStat(cleanedDf)
+    stats.write.mode("overwrite").parquet("src/main/data/match_stats/")
 
     val statsParquet = spark.read.parquet("src/main/data/match_stats/")
 
     val joinedDf = cleanedDf.withColumnRenamed("adversaire","adversaire_drop")
       .join(statsParquet, col("adversaire_drop") === statsParquet.col("adversaire"), "inner")
       .drop("adversaire_drop")
+
     joinedDf.withColumn("Year", substring_index(col("date"), "-", 1))
       .withColumn("Month", substring_index(substring_index(col("date"), "-", -2), "-", 1))
       .write.partitionBy("Year","Month").mode("overwrite").parquet("src/main/data/match_stats_2/")
-    joinedDf.show
+  }
+
+  def testLauncher(df: DataFrame, output: String): DataFrame ={
+    val cleanedDf = cleanDf(df)
+    val stats = avgOpponentStat(cleanedDf)
+    stats.write.mode("overwrite").parquet(output)
+
+    val joinedDf = cleanedDf.withColumnRenamed("adversaire","adversaire_drop")
+      .join(stats, col("adversaire_drop") === stats.col("adversaire"), "inner")
+      .drop("adversaire_drop")
+
+    joinedDf.withColumn("Year", substring_index(col("date"), "-", 1))
+      .withColumn("Month", substring_index(substring_index(col("date"), "-", -2), "-", 1))
+      .write.partitionBy("Year","Month").mode("overwrite").parquet(output + "_2")
+
+    return joinedDf
   }
 
   def cleanDf(dataFrame: DataFrame): DataFrame ={
@@ -36,7 +52,7 @@ object FootballApp {
   def avgOpponentStat(dataFrame: DataFrame): DataFrame = {
     val homeUdf = udf(isHome _)
 
-    val stats = dataFrame.withColumn("domicile", homeUdf(col("match")) as "domicile")
+    dataFrame.withColumn("domicile", homeUdf(col("match")) as "domicile")
       .groupBy(col("adversaire"))
       .agg(
         avg("score_france").as("avg_france_score_by_match"),
@@ -48,9 +64,6 @@ object FootballApp {
         (sum(col("penalty_france")) - sum(col("penalty_adversaire"))).as("penalty_difference")
       )
       .withColumn("home_percentage", (col("home_game")/col("total_match")) * 100)
-
-    stats.write.mode("overwrite").parquet("src/main/data/match_stats/")
-    stats
   }
 
   def isHome(s: String): Boolean ={
