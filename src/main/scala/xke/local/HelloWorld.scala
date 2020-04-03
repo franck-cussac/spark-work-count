@@ -35,6 +35,5 @@ object HelloWorld {
     df.write.mode("overwrite").parquet("src/main/parquet/ex1.parquet")
   }
   val stringToIntUdf: UserDefinedFunction = udf(stringToInt _ )
-
-
+  
 }
