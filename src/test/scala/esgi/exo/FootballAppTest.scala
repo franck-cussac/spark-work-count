@@ -1,6 +1,6 @@
 package esgi.exo
 
-import org.apache.spark.sql.SaveMode
+import org.apache.spark.sql.functions._
 import org.scalatest.{FunSuite, GivenWhenThen}
 import spark.{DataFrameAssertions, SharedSparkSession}
 
@@ -98,4 +98,36 @@ class FootballAppTest extends FunSuite with GivenWhenThen with DataFrameAssertio
   }
 
   // integration tests
+  test("Je veux vérifier que la sélection de tous les matchs de mars 1980 à nos jours ont bien les bonnes colonnes") {
+    val input = "src/main/resources/df_matches.csv"
+
+    val fillPenaltyUdf = udf(FootballApp.fillPenalty _)
+
+    Given("Un dataset avec 13 colonnes : X2, X4, X5, X6, adversaire, score_france, score_adversaire, penalty_france, penalty_adversaire, date, year, outcome et no")
+    val inputDf = spark.read
+      .option("delimiter", ",")
+      .option("header", true)
+      .option("inferSchema", true)
+      .csv(input)
+
+    When("")
+    val df_matches_modified = FootballApp
+      .renameColumns(
+        inputDf,
+        Map(
+          "X4" -> "match",
+          "X6" -> "competition"
+        )
+      )
+      .select("match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
+      .withColumn("penalty_france", fillPenaltyUdf(col("penalty_france")))
+      .withColumn("penalty_adversaire", fillPenaltyUdf(col("penalty_adversaire")))
+
+    val actualDf = FootballApp.filterByDateGeq(df_matches_modified, "date", "1980-03-01")
+
+    Then("Un dataset avec X colonnes : ?")
+    val expectedRows = 441
+
+    assert(actualDf.count() === expectedRows)
+  }
 }
