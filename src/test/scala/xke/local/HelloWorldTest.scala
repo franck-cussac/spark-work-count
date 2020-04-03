@@ -35,32 +35,52 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   }*/
 
   test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
-
-  }
-
-  test("je veux renommer la colonne des moyennes des numéros département") {
-
     Given("une dataframe avec au moins 3 colonnes : nom région, code région et numéro département")
     val input = spark.sparkContext.parallelize(
       List(
-        ("IdF", 1, 10),
-        ("IdF", 1, 20),
-        ("IdF", 1, 30),
-        ("Occitanie", 4, 31)
+        (1, 10, "IdF"),
+        (1, 20, "IdF"),
+        (1, 30, "IdF"),
+        (4, 31, "Occitanie")
       )
-    ).toDF("nom_region", "code_region", "code_departement")
+    ).toDF("code_region", "code_departement", "nom_region")
 
 
     val expected = spark.sparkContext.parallelize(
       List(
-      ("Idf", 1, 20.0),
-      ("Occitanie", 4, 31.0)
-    )
-    ).toDF("nom_region", "code_region", "avg(code_departement)")
+        (1, 20, "IdF"),
+        (4, 31, "Occitanie")
+      )
+    ).toDF("code_region", "avg(code_departement)", "nom_region")
 
     When("On créait une colonne avec la moyenne des numéro département par code région et les colonnes code_region, avg_dep, nom_region")
 
     val actual = HelloWorld.avgDepByReg(input)
+
+    Then("On devrait obtenir expected")
+    assertDataFrameEquals(actual, expected)
+  }
+
+  test("je veux renommer la colonne des moyennes des numéros département") {
+    Given("une dataframe avec au moins une colonne avg(code_departement)")
+    val input = spark.sparkContext.parallelize(
+      List(
+        (1, 20, "IdF"),
+        (4, 31, "Occitanie")
+      )
+    ).toDF("code_region", "avg(code_departement)", "nom_region")
+
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        (1, 20, "IdF"),
+        (4, 31, "Occitanie")
+      )
+    ).toDF("code_region", "avg_dep", "nom_region")
+
+    When("On renomme la colonne avg(code_departement) en avg_dep")
+
+    val actual = HelloWorld.renameColumn(input, "avg(code_departement)", "avg_dep")
 
     Then("On devrait obtenir expected")
     assertDataFrameEquals(actual, expected)

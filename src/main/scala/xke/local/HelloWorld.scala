@@ -2,6 +2,8 @@ package xke.local
 
 import org.apache.spark.sql.{DataFrame, _}
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.udf
+import org.apache.spark.sql.expressions.UserDefinedFunction
 
 object HelloWorld {
   def main(args: Array[String]): Unit = {
@@ -15,14 +17,23 @@ object HelloWorld {
     // 3) renommer la colonne moyenne des départements en avg_dep
     // 4) écrire le fichier en parquet
 
+    val df = spark.read.option("header", true).csv("src/main/resources/departements-france.csv")
+
+    val avg = avgDepByReg(df)
+
+    avg.show()
 
   }
 
   def avgDepByReg(dataFrame: DataFrame): DataFrame = {
 
-    dataFrame.groupBy(col("code_region"), col("nom_region")).avg("code_departement")
+    dataFrame.groupBy("code_region", "nom_region").agg(avg("code_departement"))
   }
-  def renameColumn(dataFrame: DataFrame, oldC : String, newC : String) = {
-    dataFrame.col(oldC).as(newC)
+  def renameColumn(dataFrame: DataFrame, oldC : String, newC : String): DataFrame = {
+    dataFrame.withColumnRenamed(oldC, newC)
+  }
+
+  def writeParquet(dataFrame: DataFrame): Unit = {
+    dataFrame.write.mode("overwrite").parquet("src/main/parquets/output.parquet")
   }
 }
