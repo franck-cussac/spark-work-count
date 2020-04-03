@@ -11,7 +11,7 @@ object HelloWorld {
   val DEFAULT_PARQUET_OUT_PUT_PATH = "src/main/parquets/parquet-result"
 
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate()
+    val spark = SparkSession.builder().appName("HelloWorld").master("local[*]").getOrCreate()
 
     if (args.length >= 3) {
 
