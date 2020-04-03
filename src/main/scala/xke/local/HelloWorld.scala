@@ -40,7 +40,7 @@ object HelloWorld {
   }
 
   def exo1(spark: SparkSession): DataFrame = {
-    val df = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france.csv")
+    val df = spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france-short.csv")
       .withColumn("code_departement", stringToIntUdf(col("code_departement")).as("code_departement"))
 
     val avg = avgDepByReg(df)

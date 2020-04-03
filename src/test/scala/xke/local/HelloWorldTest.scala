@@ -34,7 +34,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(actually, expected)
   }*/
 
-  /*test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
+  test("je veux ajouter une colonne avec la moyenne des numéros département par région") {
     Given("Un dataframe avec une région et deux département pour une moyenne")
 
     val input = spark.sparkContext.parallelize(
@@ -87,7 +87,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     assertDataFrameEquals(actual, expected)
   }
 
- /* test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
+  test("je veux vérifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet") {
     Given("a dataframe from file")
     spark.read.option("sep", ",").option("header", true).csv("src/main/resources/departements-france-short.csv")
 
@@ -104,7 +104,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     Then("result")
     assertDataFrameEquals(main, expected)
-  }*/
+  }
 
   test("je veux verifier que mon string est bien transformé en int") {
     Given("a string")
@@ -122,7 +122,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     val res = HelloWorld.stringToInt(str)
     Then("I check typeof")
     assert(res === 1)
-  }*/
+  }
 
   test("je veux verifier que les caractères sont bien retirés") {
     Given("a string")
@@ -150,7 +150,6 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     When("I call the function")
     val res = HelloWorld.joinWithUdf(df1, df2, "col2")
-    res.show()
     Then("I check DFs are equal")
     val expected = spark.sparkContext.parallelize(
       List(
