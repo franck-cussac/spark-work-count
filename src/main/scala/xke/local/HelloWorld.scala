@@ -15,12 +15,14 @@ object HelloWorld {
   val url_parquet_dept_folder = "src/main/resources/parquet_dept/output.parquet"
   val url_parquet_city_folder = "src/main/resources/parquet_city/output.parquet"
   val save_mode = "overwrite"
+  /***/
   val colname_code_department = "code_departement"
   val colname_department_code = "department_code"
   val colname_avg_department = "avg_dep"
   val colname_code_region = "code_region"
   val colname_nom_region = "nom_region"
   val join_type = "left_outer"
+  /***/
   val spark = SparkSession.builder()
     .appName(app_name)
     .master(app_master)

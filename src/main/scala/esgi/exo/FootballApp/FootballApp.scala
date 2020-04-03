@@ -11,24 +11,25 @@ object FootballApp {
   val app_master = "local[*]"
   val file_delimiter = ","
   val url_football_file = "src/main/resources/df_matches.csv"
+  val save_mode = "overwrite"
+  val url_parquet_stats_folder = "src/main/resources/parquet_football/stats.parquet"
+  /***/
   val colname_match = "match"
   val colname_competition = "competition"
   val colname_year = "year"
   val colname_outcome = "outcome"
   val colname_date = "date"
   val colname_no = "no"
-  val condition_filter = ""
-
-  val url_cities_file = "src/main/resources/cities.csv"
-  val url_parquet_dept_folder = "src/main/resources/parquet_dept/output.parquet"
-  val url_parquet_city_folder = "src/main/resources/parquet_city/output.parquet"
-  val save_mode = "overwrite"
-  val colname_code_department = "code_departement"
-  val colname_department_code = "department_code"
-  val colname_avg_department = "avg_dep"
-  val colname_code_region = "code_region"
-  val colname_nom_region = "nom_region"
-  val join_type = "left_outer"
+  val colname_penalty_france = "penalty_france"
+  val colname_penalty_adversaire = "penalty_adversaire"
+  val colname_played_home = "played_home"
+  val colname_adversaire = "adversaire"
+  val colname_score_france = "score_france"
+  val colname_score_adversaire = "score_adversaire"
+  val colname_pourcentage_match_domicile = "pourcentage_match_domicile"
+  val colname_matchs_en_cdm = "matchs_en_cdm"
+  var colname_ecart_penalty = "ecart_penalty"
+  /***/
   val spark = SparkSession.builder()
     .appName(app_name)
     .master(app_master)
@@ -38,34 +39,41 @@ object FootballApp {
 
   def main(args: Array[String]): Unit = {
 
+    /** Nettoyer les donnees **/
     val dff = getFootballInfosDF()
-    val dff_renamed = renameColumn(dff, "X4", colname_match)
+      .withColumnRenamed("X4", colname_match)
       .withColumnRenamed("X6", colname_competition)
       .drop(colname_year)
       .drop(colname_outcome)
       .drop(colname_no)
       .na.fill(0)
       .filter(to_date(col(colname_date)).gt(lit("1980-03-01")))
+    //dff.show
 
-
-    val dfd_avg = avgDepByReg(dfd)
-    val dfd_renamed = renameColumn(dfd_avg, "avg(code_departement)", colname_avg_department)
-    dfd_renamed.show
-    dfd_renamed.write
+    /** Calculer les statistiques **/
+    val df_stats = dff
+      .withColumn(colname_played_home, newColumn(col(colname_match)))
+        .groupBy(colname_adversaire)
+        .agg(
+          avg(colname_score_france),
+          avg(colname_score_adversaire),
+          count(colname_match), //nb matchs joué
+          avg(when(col(colname_played_home),1))
+            ./(count(colname_match))
+            .as(colname_pourcentage_match_domicile),
+          count(when(col(colname_competition).startsWith("Coupe du monde"),"true"))
+            .as(colname_matchs_en_cdm),
+          max(col(colname_penalty_adversaire)),
+          count(col(colname_penalty_adversaire).-(col(colname_penalty_france)))
+            .as(colname_ecart_penalty)
+        )
+    //df_stats.show
+    df_stats.write
       .mode(save_mode)
-      .parquet(url_parquet_dept_folder)
+      .parquet(url_parquet_stats_folder)
 
-    val dfc = getCitiesDF()
-    val df_join = dfd.join(
-      dfc,
-      dfd(colname_code_department) === dfc(colname_department_code),
-      join_type
-    ).drop(colname_department_code)
-    df_join.show
-    df_join.write
-      .partitionBy(colname_code_region,colname_code_department)
-      .mode(save_mode)
-      .parquet(url_parquet_city_folder)
+    /** Jointure avec une autre source de données **/
+    val df_stats_parquet = 
   }
 
   /**
@@ -80,83 +88,18 @@ object FootballApp {
   }
 
 
-  /**
-    * UDF de conversion d'un String en Int
-    */
-  val toInteger: UserDefinedFunction = udf(convertInt _)
+  val newColumn: UserDefinedFunction = udf(homeOrNot _)
 
   /**
-    * convertit un null en Int 0
+    * permet de savoir si La France a joué à domicile ou non
     * @param s
-    * @return Int
+    * @return Boolean
     */
-  def nullIntoZero(s: String) : Int = {
-    if(s.startsWith("0")) {
-      s.substring(1).toInt
-    }
-    if(s.endsWith("A") || s.endsWith("B")){
-      s.substring(0,s.length-1).toInt
-    } else{
-      s.toInt
-    }
-  }
-
-
-
-  /**
-    * retourne une dataframe sur les villes
-    * @return DataFrame
-    */
-  def getCitiesDF() : DataFrame = {
-    spark.read
-      .option("delimiter", file_delimiter)
-      .option("header", true)
-      .csv(url_cities_file)
-      .withColumn(colname_department_code, toInteger(col(colname_department_code)))
-  }
-
-  /**
-    * retourne la moyenne des Departement d'une region
-    * @param df
-    * @return DataFrame
-    */
-  def avgDepByReg(df : DataFrame): DataFrame = {
-    df.groupBy(col(colname_code_region), col(colname_nom_region))
-      .agg(
-        avg(colname_code_department)
-      )
-  }
-  // a evoluer
-
-  /**
-    * renomme une colonne
-    * @param df
-    * @param oldName
-    * @param newName
-    * @return DataFrame
-    */
-  def renameColumn(df : DataFrame, oldName : String, newName : String): DataFrame = {
-    df.withColumnRenamed(oldName, newName)
-  }
-
-  /**
-    * UDF de conversion d'un String en Int
-    */
-  val toInteger: UserDefinedFunction = udf(convertInt _)
-
-  /**
-    * convertit un String en Int
-    * @param s
-    * @return Int
-    */
-  def convertInt(s: String) : Int = {
-    if(s.startsWith("0")) {
-      s.substring(1).toInt
-    }
-    if(s.endsWith("A") || s.endsWith("B")){
-      s.substring(0,s.length-1).toInt
-    } else{
-      s.toInt
+  def homeOrNot(game : String) : Boolean = {
+    if(game.startsWith("France")) {
+      true
+    } else {
+      false
     }
   }
 }
