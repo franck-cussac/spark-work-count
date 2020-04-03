@@ -23,6 +23,8 @@ object FootballApp {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate()
 
+    // Part 1
+
     // Get Matches
     val dfMatches = fetchMatches(spark)
 
@@ -36,24 +38,25 @@ object FootballApp {
 
     val df = clean_data(dfClean)
 
-    val d = removeNull(df: DataFrame)
+    val d = removeNull(df)
 
     val dfMatchGt1980 = filterMatchGt1980(d)
 
-    val dfJoue = addColumn(dfMatchGt1980)
+    dfMatchGt1980.show(20, false)
 
-    dfJoue.show(20, false)
-//
+    // Part 2
+
+    val dfJoue = addColumnJoue(dfMatchGt1980)
 
     val scoreFrance = getAvgScorceFrance(dfJoue)
 
     scoreFrance.show(800, false)
-//    writeStats(scoreFrance)
+    writeStats(scoreFrance)
 
-    val ddd =  join(dfJoue, scoreFrance)
+    // Part 3
+    val jointureStatFirstPart =  join(dfJoue, scoreFrance)
 
-    ddd.show()
-
+    jointureStatFirstPart.show()
     writeResult(scoreFrance)
   }
 
@@ -94,16 +97,15 @@ object FootballApp {
       .cast("timestamp")))
   }
 
-  def addColumn(dataFrame: DataFrame): DataFrame = {
-    dataFrame.withColumn("joue", splitColumn(col("match")))
+  def addColumnJoue(dataFrame: DataFrame): DataFrame = {
+    dataFrame.withColumn("joue", isDomicileUdf(col("match")))
   }
 
-  val splitColumn: UserDefinedFunction = udf(mat _)
+  val isDomicileUdf: UserDefinedFunction = udf(isDomicile _)
 
-
-  def mat(thematch: String): Boolean = {
-    val dat = thematch.trim.split(' ')(0)
-    dat match {
+  def isDomicile(matchName: String): Boolean = {
+    val matchNameCut = matchName.trim.split(' ')(0)
+    matchNameCut match {
       case "France" => true
       case _ => false
     }
@@ -121,17 +123,6 @@ object FootballApp {
     )
   }
 
-
-
-  val moyenneUdf: UserDefinedFunction = udf(moyenneB _)
-  def moyenneB(thematch: String): Boolean = {
-    val dat = thematch.trim.split(' ')(0)
-    dat match {
-      case "France" => true
-      case _ => false
-    }
-  }
-
   def writeStats(dataFrame: DataFrame): Unit = {
     dataFrame.write
       .mode("overwrite")
@@ -144,13 +135,12 @@ object FootballApp {
       .parquet("src/main/resources/result.parquet")
   }
 
-
   def clean_data(dataFrame: DataFrame): DataFrame = {
     dataFrame
-      .filter(clean(col("match") ))
+      .filter(isValidLineUdf(col("match")))
   }
 
-  val clean: UserDefinedFunction = udf(isValidLine _)
+  val isValidLineUdf: UserDefinedFunction = udf(isValidLine _)
 
   def isValidLine(value: String): Boolean = {
     value match {
@@ -161,14 +151,9 @@ object FootballApp {
     }
   }
 
-
-
-  def join(dfPart1: DataFrame, dfPart2: DataFrame): DataFrame = {
-    dfPart1.join(dfPart2, dfPart1("adversaire") === dfPart2("adversaire"), "left_outer")
+  def join(dfMatches: DataFrame, dfStats: DataFrame): DataFrame = {
+    dfMatches.join(dfStats, dfMatches("adversaire") === dfStats("adversaire"), "left_outer")
       .drop("adversaire")
   }
-
-  val cond: UserDefinedFunction = udf(isValidLine _)
-
 
 }

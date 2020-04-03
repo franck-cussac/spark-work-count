@@ -1,6 +1,6 @@
 package esgi.exo
 
-import esgi.exo.FootballApp.mat
+import esgi.exo.FootballApp.isDomicile
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.udf
 import org.scalatest.{FunSuite, GivenWhenThen}
@@ -56,28 +56,28 @@ class FootballAppTest extends FunSuite with GivenWhenThen with DataFrameAssertio
     assertDataFrameEquals(actual, expected)
   }
 
-//  test("je veux selectionner remplacer les valeurs null par 0") {
-//    Given("une dataframe avec au moins 8 colonnes : match, competition, adversaire, score_france, score_adversaire, penalty_france, penalty_adversaire")
-//    val input = spark.sparkContext.parallelize(
-//      List(
-//        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", null, "1904-05-01")
-//      ))
-//      .toDF(
-//        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
-//
-//    val expected = spark.sparkContext.parallelize(
-//      List(
-//        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1904-05-01")
-//      ))
-//      .toDF(
-//        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
-//
-//    When("Je retire les éléments null")
-//    val actual = FootballApp.removeNull(input)
-//
-//    Then("Je m'attend à ce qu'il n'y ai pas d'éléments nul dans les pénalties")
-//    assertDataFrameEquals(actual, expected)
-//  }
+  test("je veux selectionner remplacer les valeurs null par 0") {
+    Given("une dataframe avec au moins 8 colonnes : match, competition, adversaire, score_france, score_adversaire, penalty_france, penalty_adversaire")
+    val input = spark.sparkContext.parallelize(
+      List(
+        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "NA", "1904-05-01")
+      ))
+      .toDF(
+        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1904-05-01")
+      ))
+      .toDF(
+        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
+
+    When("Je retire les éléments null")
+    val actual = FootballApp.removeNull(input)
+
+    Then("Je m'attend à ce qu'il n'y ai pas d'éléments nul dans les pénalties")
+    assertDataFrameEquals(actual, expected)
+  }
 
   test("je veux filter par date supérieur à 1980-03-01") {
     Given("une dataframe avec au moins 8 colonnes : match, competition, adversaire, score_france, score_adversaire, penalty_france, penalty_adversaire")
@@ -103,11 +103,89 @@ class FootballAppTest extends FunSuite with GivenWhenThen with DataFrameAssertio
     assertDataFrameEquals(actual, expected)
   }
 
-//  test("je veux ajouter une colonne pour savoir si le match a été joué à domicile") {
+  test("je veux écrire dans mon parquet les stats") {
+    Given("une dataframe avec au moins 8 colonnes : match, competition, adversaire, score_france, score_adversaire, penalty_france, penalty_adversaire")
+    val input = spark.sparkContext.parallelize(
+      List(
+        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02"),
+        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1978-03-01")
+      ))
+      .toDF(
+        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
+
+    When("J'écris")
+    FootballApp.writeStats(input)
+
+    Then("Je m'attend à avoirs 2 résultats")
+    spark.read.parquet("src/main/resources/stats.parquet").count() shouldEqual  2
+  }
+
+  test("je veux écrire dans mon parquet les resultats des matches") {
+    Given("une dataframe avec au moins 8 colonnes : match, competition, adversaire, score_france, score_adversaire, penalty_france, penalty_adversaire")
+    val input = spark.sparkContext.parallelize(
+      List(
+        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02"),
+        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1978-03-01")
+      ))
+      .toDF(
+        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
+
+    When("J'écris")
+    FootballApp.writeResult(input)
+
+    Then("Je m'attend à avoirs 2 résultats")
+    spark.read.parquet("src/main/resources/result.parquet").count() shouldEqual  2
+  }
+
+  test("je veux filter les lignes dont les colonnes ne sont pas valides") {
+    Given("une dataframe avec au moins 8 colonnes : match, competition, adversaire, score_france, score_adversaire, penalty_france, penalty_adversaire")
+    val input = spark.sparkContext.parallelize(
+      List(
+        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02"),
+        (" Croates et Slovènes\"", "Match amical", "Belgique", "3", "3", "0", "0", "1978-03-01")
+      ))
+      .toDF(
+        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02")
+      ))
+      .toDF(
+        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
+
+    When("Je filtre")
+    val actual = FootballApp.clean_data(input)
+
+    Then("Je m'attend à ce que les lignes soient filtrés")
+    assertDataFrameEquals(actual, expected)
+  }
+
+  test("je veux ajouter une colonne joue") {
+    Given("une dataframe avec au moins 8 colonnes : match, competition, adversaire, score_france, score_adversaire, penalty_france, penalty_adversaire")
+    val input = spark.sparkContext.parallelize(
+      List(
+        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02")
+      ))
+      .toDF(
+        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02", false)
+      ))
+      .toDF(
+        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date", "joue")
+
+    When("J'ajoute la colonne")
+    val actual = FootballApp.addColumnJoue(input)
+
+    Then("Je m'attend à ce que la colonne soit ajoutée")
+    assertDataFrameEquals(actual, expected)
+  }
+
+//  test("je veux effectuer les stats des matches") {
 //    Given("une dataframe avec au moins 8 colonnes : match, competition, adversaire, score_france, score_adversaire, penalty_france, penalty_adversaire")
-//
-//    val splitColumn: UserDefinedFunction = udf(mat _)
-//
 //    val input = spark.sparkContext.parallelize(
 //      List(
 //        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02")
@@ -117,17 +195,16 @@ class FootballAppTest extends FunSuite with GivenWhenThen with DataFrameAssertio
 //
 //    val expected = spark.sparkContext.parallelize(
 //      List(
-//        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02")
+//        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02", false)
 //      ))
 //      .toDF(
-//        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date", "joue")
+//        "adversaire", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date", "joue")
 //
-//    When("J'a")
-//    val actual = FootballApp.mat(input)
+//    When("J'ajoute la colonne")
+//    val actual = FootballApp.addColumnJoue(input)
 //
-//    Then("Je m'attend à ce qu'il n'y ai une dataframe avec une nouvelle colonne joue")
+//    Then("Je m'attend à ce que la colonne soit ajoutée")
 //    assertDataFrameEquals(actual, expected)
 //  }
-
 
 }
