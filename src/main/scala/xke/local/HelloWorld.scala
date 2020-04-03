@@ -39,6 +39,7 @@ object HelloWorld {
     case _  => Some(input.toInt);
   }
 
+
   val stringToIntUdf = udf( (x: String) => stringToInt(x))
 
   def joinLocations(villes: DataFrame, departements: DataFrame, regions: DataFrame): DataFrame = {
@@ -53,7 +54,27 @@ object HelloWorld {
   }
 
   def writeLocations(locations: DataFrame, output: String) = {
-    locations.write.mode("append").partitionBy("region_code","departement_code").parquet(output)
+    locations.write.mode("append").partitionBy("region_code","department_code").parquet(output)
   }
 
+  def pefixe(df: DataFrame) : DataFrame = {
+    val newNames = df.columns.map(c => df(c).as(df(c).toString()))
+    df
+  }
+
+  def ExoJoin() = {
+    val spark = SparkSession.builder().getOrCreate()
+
+    val villes = spark.read.option("sep",",").option("header",true  ).csv("src/main/resources/cities.csv")
+    val departements = spark.read.option("sep",",").option("header",true  ).csv("src/main/resources/departments.csv")
+    val regions = spark.read.option("sep",",").option("header",true  ).csv("src/main/resources/regions.csv")
+
+    val locations =
+      joinLocations(villes,departements,regions)
+          .drop(col("id"))
+          .drop(col("slug"))
+    locations.show()
+
+    writeLocations(locations,"src/main/resources/full-location-out.csv")
+  }
 }
