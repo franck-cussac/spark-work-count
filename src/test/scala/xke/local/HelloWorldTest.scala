@@ -114,26 +114,6 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
   }
 
-  /*test("join test") {
-    val input = spark.sparkContext.parallelize(
-      List(
-        (10 , 75, "Ile de france"),
-        ( 20 , 50, "Aquitaine")
-      )
-    ).toDF("code_region", "avg(code_departement)", "nom_region")
-
-
-    val expected = spark.sparkContext.parallelize(
-      List(
-        (10 , 75, "Ile de france"),
-        ( 30 , 50, "Aquitaine")
-      )
-    ).toDF("code_region", "avg_dep", "sauce")
-
-    val df = input.join(expected, input("code_region") === expected("code_region"))
-    df.show()
-  }*/
-
   test("je veux vérifier que je les 0 soit supprimé"){
     val input = "01"
 
@@ -212,5 +192,27 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
 
     assert(actually.count() === 2 )
   }
+
+
+
+  /*test("join test") {
+    val input = spark.sparkContext.parallelize(
+      List(
+        (10 , 75, "Ile de france"),
+        ( 20 , 50, "Aquitaine")
+      )
+    ).toDF("code_region", "avg(code_departement)", "nom_region")
+
+
+    val expected = spark.sparkContext.parallelize(
+      List(
+        (10 , 75, "Ile de france"),
+        ( 30 , 50, "Aquitaine")
+      )
+    ).toDF("code_region", "avg_dep", "sauce")
+
+    val df = input.join(expected, input("code_region") === expected("code_region"))
+    df.show()
+  }*/
 
 }

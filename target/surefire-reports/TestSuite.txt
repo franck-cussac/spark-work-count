@@ -1,26 +1,45 @@
 Discovery starting.
-Discovery completed in 2 seconds, 813 milliseconds.
-Run starting. Expected test count is: 7
+Discovery completed in 3 seconds, 314 milliseconds.
+Run starting. Expected test count is: 13
+FootballAppTest:
+- je veux nettoyer mes donn?es en renommant, selectionnant, compl?tant et filtrant (5 seconds, 352 milliseconds)
+  + Given dataframe avec X2,X4,X5,X6,adversaire,score_france,score_adversaire,penalty_france,penalty_adversaire,date,year,outcome,no 
+  + When rename X4 et X6, ne garder que les dates valides, mettre des 0 dans les penalty non assign?, ne garder que les matchs apres mars 1980 
+  + Then return ok 
+- je veux v?rifier que la France soit ? domicile quand le match commence par France (3 milliseconds)
+- je veux v?rifier que la France soit ? l'ext?rieur quand le match ne commence pas par France (0 milliseconds)
+- je veux cr?er des statistiques des aversaires (3 seconds, 581 milliseconds)
+  + Given dataframe avec "match", "competition","adversaire","score_france","score_adversaire","penalty_france","penalty_adversaire","date", "domicile" 
+  + When calcule de stats des adversaires 
+  + Then return ok 
+- je veux v?rifier que la sauvegarde en parquet des statistiques soit bonne (8 seconds, 65 milliseconds)
+  + Given given un fichier source de match 
+  + When clean & calcul stats 
+  + Then Les dataframes correspondent 
+- je veux v?rifier que la jointure et que le parquet partitionn? soient valides (994 milliseconds)
+  + Given  2 dataframes left right ? joindre 
+  + When Parquet selon date et mois 
+  + Then Le nombre de ligne du sous parquet correspond 
 HelloWorldTest:
-- je veux ajouter une colonne avec la moyenne des num?ros d?partement par r?gion (6 seconds, 163 milliseconds)
+- je veux ajouter une colonne avec la moyenne des num?ros d?partement par r?gion (2 seconds, 911 milliseconds)
   + Given dataframe avec 3 colonnes : nom r?gion, code r?gion, num?ro d?partement 
   + When calcule average 
   + Then return ok 
-- je veux renommer la colonne des moyennes des num?ros d?partement (2 seconds, 481 milliseconds)
+- je veux renommer la colonne des moyennes des num?ros d?partement (2 seconds, 58 milliseconds)
   + Given dataframe avec 3 colonnes : nom r?gion, code r?gion, moyenne des d?partements 
   + When rename column 
   + Then column renamed 
-- je veux v?rifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet (8 seconds, 676 milliseconds)
+- je veux v?rifier que je lis un fichier, ajoute une colonne, la renomme, et sauvegarde mon fichier en parquet (6 seconds, 839 milliseconds)
   + When calcule average 
-- je veux v?rifier que je les 0 soit supprim? (2 milliseconds)
+- je veux v?rifier que je les 0 soit supprim? (0 milliseconds)
 - je veux v?rifier que le B soit supprim? (0 milliseconds)
-- je veux v?rifier que la jointure est bonne (4 seconds, 502 milliseconds)
+- je veux v?rifier que la jointure est bonne (3 seconds, 674 milliseconds)
   + When joinin cities / departments / regions 
-- je veux v?rifier que la partition du fichier soit bonne (552 milliseconds)
+- je veux v?rifier que la partition du fichier soit bonne (399 milliseconds)
   + Given dataframe avec 3 colonnes : nom r?gion, code r?gion, moyenne des d?partements 
   + When partitionning city department and region 
-Run completed in 25 seconds, 220 milliseconds.
-Total number of tests run: 7
-Suites: completed 2, aborted 0
-Tests: succeeded 7, failed 0, canceled 0, ignored 0, pending 0
+Run completed in 37 seconds, 227 milliseconds.
+Total number of tests run: 13
+Suites: completed 3, aborted 0
+Tests: succeeded 13, failed 0, canceled 0, ignored 0, pending 0
 All tests passed.
