@@ -11,7 +11,13 @@ object FootballApp {
   val app_master = "local[*]"
   val file_delimiter = ","
   val url_football_file = "src/main/resources/df_matches.csv"
-
+  val colname_match = "match"
+  val colname_competition = "competition"
+  val colname_year = "year"
+  val colname_outcome = "outcome"
+  val colname_date = "date"
+  val colname_no = "no"
+  val condition_filter = ""
 
   val url_cities_file = "src/main/resources/cities.csv"
   val url_parquet_dept_folder = "src/main/resources/parquet_dept/output.parquet"
@@ -32,7 +38,14 @@ object FootballApp {
 
   def main(args: Array[String]): Unit = {
 
-    val dfd = getFootballInfosDF()
+    val dff = getFootballInfosDF()
+    val dff_renamed = renameColumn(dff, "X4", colname_match)
+      .withColumnRenamed("X6", colname_competition)
+      .drop(colname_year)
+      .drop(colname_outcome)
+      .drop(colname_no)
+      .na.fill(0)
+      .filter(to_date(col(colname_date)).gt(lit("1980-03-01")))
 
 
     val dfd_avg = avgDepByReg(dfd)
@@ -65,6 +78,30 @@ object FootballApp {
       .option("header", true)
       .csv(url_football_file)
   }
+
+
+  /**
+    * UDF de conversion d'un String en Int
+    */
+  val toInteger: UserDefinedFunction = udf(convertInt _)
+
+  /**
+    * convertit un null en Int 0
+    * @param s
+    * @return Int
+    */
+  def nullIntoZero(s: String) : Int = {
+    if(s.startsWith("0")) {
+      s.substring(1).toInt
+    }
+    if(s.endsWith("A") || s.endsWith("B")){
+      s.substring(0,s.length-1).toInt
+    } else{
+      s.toInt
+    }
+  }
+
+
 
   /**
     * retourne une dataframe sur les villes
