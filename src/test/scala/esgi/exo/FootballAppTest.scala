@@ -174,19 +174,76 @@ class FootballAppTest extends FunSuite with GivenWhenThen with DataFrameAssertio
   // Exo2 : Calcul de statistiques
 
   test("Match à domicile"){
-
-  }
-
-  test("Match en extérieur"){
-
+      Given("Un dataset contenant le match")
+      val input = List(
+        ("France - Gifs-Sur-Yvette"),
+        ("Bresil - France"),
+        ("France - Belgique"),
+        ("Gifs-Sur-Yvette - France")
+      ).toDF(
+        "match"
+      )
+    val expected = List(
+      ("France - Gifs-Sur-Yvette",true),
+      ("Bresil - France",false),
+      ("France - Belgique", true),
+      ("Gifs-Sur-Yvette - France", false)
+    ).toDF(
+      "match", "a_domicile"
+    )
+      When("")
+      val actual = FootballApp.matchesWithDomicileColumn(input)
+      Then("")
+      assertDataFrameEquals(expected,actual)
   }
 
   test("nb points marqué par la Fr par match"){
+   // FootballApp.main(null)
+    Given("J'ai un dataframe ")
+      val input = List(
+        ("Maurice","2"),
+        ("Maurice","4"),
+        ("Brésil","3")
+      ).toDF(
+        "adversaire", "score_adversaire"
+      )
 
+    val expected = List(
+      ("Maurice","2"),
+      ("Maurice","4"),
+      ("Brésil","3")
+    ).toDF(
+      "adversaire", "score_adversaire"
+    )
+    When("je recupère le nombre de points marqué par match")
+     //val actual = FootballApp.scoreFromOpponent(input)
+
+    Then("Maurice 3, Bresil 3")
+ //   assertDataFrameEquals(expected,actual)
   }
 
-  test("nb points encaissé par la Fr par match"){
+  test("nb points encaissé par l'adversaire par match"){
+    Given("J'ai un dataframe ")
+    val input = List(
+      ("Maurice","2"),
+      ("Maurice","4"),
+      ("Brésil","3")
+    ).toDF(
+      "adversaire", "score_france"
+    )
 
+    val expected = List(
+      ("Maurice","2"),
+      ("Maurice","4"),
+      ("Brésil","3")
+    ).toDF(
+      "adversaire", "score_france"
+    )
+    When("je recupère le nombre de points encaissé par match")
+    val actual = FootballApp.scoreFromFrance(input)
+
+    Then("Maurice 3, Bresil 3")
+    assertDataFrameEquals(expected,actual)
   }
 
   test("nb points match total"){
