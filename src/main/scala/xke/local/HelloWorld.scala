@@ -5,26 +5,47 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 
 object HelloWorld {
-  val spark = SparkSession.builder().master("local[*]")getOrCreate() // ctrl + Q affiche le type de la variable
+  val spark: SparkSession = SparkSession.builder().master("local[*]")getOrCreate() // ctrl + Q affiche le type de la variable
   val stringToIntUdf: UserDefinedFunction = udf(stringToInt _ )
-  import spark.implicits._
 
   def main(args: Array[String]): Unit = {
-//    val df_departement = createDateFrameDepartement(spark)
-//    val avg_dep_df = avgDepByReg(df_departement)
-//    val result_df = renameColumn(avg_dep_df)
+    executeAverageDepartmentCode()
+    executeJoinBetweenDepartmentAndCity()
+  }
 
-//    result_df.write.mode(SaveMode.Overwrite).parquet("/home/ubuntu/workspace/hadoop/spark-work-count/src/main/resources/parquet")
+  /**
+   * Crée un dataFrame a partir de données de département
+   * et créer une moyenne des code département et écrit un
+   * parquet a partir du résultat
+   */
+  def executeAverageDepartmentCode(): Unit = {
+    val df_departement = createDataFrameDepartement(spark)
+    val avg_dep_df = avgDepByReg(df_departement)
+    val result_df = renameColumn(avg_dep_df)
+    result_df.write.mode(SaveMode.Overwrite).parquet("src/main/resources/parquet")
+  }
 
+  /**
+   * Crée deux dataFrame a partir des données de département
+   * et de villes, et effectue une jointure ensuite écrit un
+   * parquet a partir du résultat
+   */
+  def executeJoinBetweenDepartmentAndCity(): Unit = {
     val df_departement = createDataFrameDepartement(spark)
     val df_cities = createDataFrameCity(spark)
+    val df_joined = df_departement.join(df_cities, "code_departement")
+    writeParquetFromJoinedDataFrame(df_joined)
+  }
 
-    val df_joined = df_departement.join(df_cities, Seq("code_departement"), "left")
-
-    df_joined
-      .write.mode(SaveMode.Overwrite)
+  /**
+   * Ecrit sur le fileSystem le parquet a partir de dataFrame
+   *
+   * @param dataFrame
+   */
+  def writeParquetFromJoinedDataFrame(dataFrame: DataFrame): Unit = {
+    dataFrame.write.mode(SaveMode.Overwrite)
       .partitionBy("code_region", "code_departement")
-      .parquet("/home/ubuntu/workspace/hadoop/spark-work-count/src/main/resources/partition_test")
+      .parquet("src/main/resources/parquetPartition")
   }
 
   /**
