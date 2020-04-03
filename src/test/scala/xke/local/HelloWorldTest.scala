@@ -8,7 +8,7 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
   val spark = SharedSparkSession.sparkSession
   import spark.implicits._
 
-  test("main must create a file with word count result") {
+  /* test("main must create a file with word count result") {
     Given("input filepath and output filepath")
     val input = "src/test/resources/input/v1/input.txt"
     val output = "src/test/resources/output/v1/parquet"
@@ -121,5 +121,5 @@ class HelloWorldTest extends FunSuite with GivenWhenThen with DataFrameAssertion
     ).toDF("code_region", "nom_region", "avg_dep")
 
     assertDataFrameEquals(outputDf, expectedDf)
-  }
+  } */
 }
