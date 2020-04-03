@@ -18,8 +18,12 @@ object FootballApp {
     // ajout des colonnes de stats
     val dfexo2 = exo2(dfWithAtHome)
     // ecriture dans un parquet
-    writeParquet(dfexo2)
-    dfexo2.show()
+    writeParquet(dfexo2, "stats.parquet")
+    // jointure parties 1 et 2
+    val dfexo3 = exo3(dfexo1, dfexo2)
+    // ecriture dans un parquet
+    writeParquet(dfexo3, "result.parquet")
+    dfexo3.show()
 
   }
 
@@ -44,6 +48,10 @@ object FootballApp {
       .drop("sum(penalty_adversaire)")
       .drop("sum(penalty_france)")
       .drop("count(CASE WHEN at_home THEN true END)")
+  }
+
+  def exo3(df1: DataFrame, df2: DataFrame): DataFrame = {
+    df1.join(df2, df1("adversaire") === df2("adversaire")).drop("adversaire")
   }
 
   def selectAndRenameColumns(dataFrame: DataFrame): DataFrame = {
@@ -87,7 +95,7 @@ object FootballApp {
     dataFrame.withColumnRenamed(oldC, newC)
   }
 
-  def writeParquet(dataFrame: DataFrame): Unit = {
-    dataFrame.write.mode("overwrite").parquet("src/main/parquets/stats.parquet")
+  def writeParquet(dataFrame: DataFrame, name: String): Unit = {
+    dataFrame.write.mode("overwrite").parquet("src/main/parquets/" + name)
   }
 }
