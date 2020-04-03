@@ -184,27 +184,4 @@ class FootballAppTest extends FunSuite with GivenWhenThen with DataFrameAssertio
     assertDataFrameEquals(actual, expected)
   }
 
-//  test("je veux effectuer les stats des matches") {
-//    Given("une dataframe avec au moins 8 colonnes : match, competition, adversaire, score_france, score_adversaire, penalty_france, penalty_adversaire")
-//    val input = spark.sparkContext.parallelize(
-//      List(
-//        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02")
-//      ))
-//      .toDF(
-//        "match", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date")
-//
-//    val expected = spark.sparkContext.parallelize(
-//      List(
-//        ("Belgique - France", "Match amical", "Belgique", "3", "3", "0", "0", "1980-03-02", false)
-//      ))
-//      .toDF(
-//        "adversaire", "competition", "adversaire", "score_france", "score_adversaire", "penalty_france", "penalty_adversaire", "date", "joue")
-//
-//    When("J'ajoute la colonne")
-//    val actual = FootballApp.addColumnJoue(input)
-//
-//    Then("Je m'attend à ce que la colonne soit ajoutée")
-//    assertDataFrameEquals(actual, expected)
-//  }
-
 }

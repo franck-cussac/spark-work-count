@@ -3,8 +3,7 @@ package esgi.exo
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.functions._
-
+import org.apache.spark.sql.functions.{udf, _}
 
 //Tout le code devra être écrit dans une classe et un
 //package nommé
@@ -20,6 +19,7 @@ import org.apache.spark.sql.functions._
 
 
 object FootballApp {
+
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("test").master("local[*]").getOrCreate()
 
