@@ -7,6 +7,8 @@ import org.apache.spark.sql.functions.{avg, _}
 object FootballApp {
   def main(args: Array[String]): Unit = {
     val isDomicile: UserDefinedFunction = udf(isHome _)
+    val isValideDataUdf: UserDefinedFunction = udf(valideData _)
+
 
     val spark = SparkSession.builder().appName("FootballApp").master("local[*]").getOrCreate()
     val df = spark.read.option("header", true).csv("src/main/resources/df_matches.csv")
@@ -15,26 +17,32 @@ object FootballApp {
     val dfMatches = deleteNullValue(dfMatchesClean)
     val dfMatchFrance = dfMatches.filter(col("date").between("1980-03-01",current_date())).withColumn("penalty_france",col("penalty_france").cast("integer")).withColumn("match_a_domicile",isDomicile(col("match")))
     dfMatchFrance
-      .show
+      .show(10000)
 
     val avgMatchFrance = avgScoreFrance(dfMatches)
-    avgMatchFrance
-      .show
+   avgMatchFrance
+     //.filter(isValideDataUdf(col("avg(CAST(score_france AS INT))")))
+     //.write.mode("overwrite").parquet("src/resources/stats.parquet/")
+    avgMatchFrance.show
 
-    val avgMatchAdv = avgScoreAdversaire(dfMatches)
+    val avgMatchAdv = avgScoreAdversaire(dfMatches).filter(isValideDataUdf(col("adversaire")))
+    //avgMatchAdv.write.mode("overwrite").parquet("src/resources/stats.parquet/")
     avgMatchAdv.show
 
     val dfPercentageMatchHome= dfMatchFrance
       .groupBy("adversaire")
       .agg(sum(when(col("match_a_domicile") === true,1)) / count(col("match_a_domicile")))
 
-    println("Match dom")
+    //dfPercentageMatchHome.write.mode("overwrite").parquet("src/resources/stats.parquet/")
+
     dfPercentageMatchHome.show
 
-    dfMatchFrance
+    val dfpenaltyFrance =  dfMatchFrance
       .groupBy("match")
       .max("penalty_france")
-      .show(100)
+
+   // dfpenaltyFrance.write.mode("overwrite").parquet("src/resources/stats.parquet/")
+    dfpenaltyFrance.show
   }
 
   def renameAndSelect(dataFrame: DataFrame) : DataFrame = {
@@ -61,7 +69,8 @@ object FootballApp {
   }
 
   def avgScoreFrance(df: DataFrame): DataFrame = {
-    df.groupBy("adversaire")
+    df
+      .groupBy("adversaire")
       .agg(avg(col("score_france").cast("integer")))
   }
 
@@ -80,5 +89,10 @@ object FootballApp {
       .as("Nombre de match")
   }
 
+  def valideData(value: String): Boolean = value match {
+    case "null" => false
+    case _ => true
+
+  }
 
 }

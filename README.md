@@ -19,4 +19,4 @@ make down-hadoop-docker
 
 La première commande construira l'image correspondant au dockerfile du repo, la deuxième lancera toutes les images docker et téléchargera celles qui vous manquent, la dernière arrête toutes les images.
 
-A bientôt pour un super talk de qualité (j'espère).
+A bientôt pour un super talk de qualité (j'espère). Je me suis retrouvé bloqué sur la création du fichier, je ne suis pas parvenu malheuresement à supprimer des caractère spéciaux malgré plusieurs tentative (,;{}()\n\t=) une erreur bloque l'ecriture du fichier 
