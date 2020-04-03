@@ -27,3 +27,5 @@ reminder
 
 avg_output.parquet
 join_output.parquet
+stats.parquet
+result.parquet
